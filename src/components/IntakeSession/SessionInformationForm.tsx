@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, getDocs, addDoc, doc, setDoc, serverTimestamp, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, addDoc, doc, setDoc, serverTimestamp} from 'firebase/firestore';
 import { format } from 'date-fns';
 import { useOrganization } from '../../context/OrganizationContext';
 
@@ -32,16 +32,13 @@ export const SessionInformationForm: React.FC<SessionInformationFormProps> = ({ 
 
     const loadLocations = async () => {
         const db = getFirestore();
-        const locationsQuery = query(
-            collection(db, 'locations'),
-            where('organizationId', '==', organizationId)
-        );
-        const snapshot = await getDocs(locationsQuery);
+        const locationsRef = collection(db, 'organizations', organizationId, 'locations');
+        const snapshot = await getDocs(locationsRef);
         const locationsList = snapshot.docs.map(doc => ({
             id: doc.id,
             name: doc.data().name,
             address: doc.data().address,
-            organizationId: doc.data().organizationId
+            organizationId: organizationId
         }));
         setLocations(locationsList);
     };
@@ -52,20 +49,25 @@ export const SessionInformationForm: React.FC<SessionInformationFormProps> = ({ 
         const locationData = {
             location: selectedLocation,
             engagementDate,
-            organizationId,
             createdAt: serverTimestamp()
         };
 
-        await addDoc(collection(db, 'participants', participantId, 'participantLocation'), locationData);
+        await addDoc(
+            collection(db, 'organizations', organizationId, 'participants', participantId, 'participantLocation'),
+            locationData
+        );
 
         const lastEngagementData = {
-            date: engagementDate,
+            date: format(new Date(engagementDate), 'MM/dd/yyyy'),
             type: 'location',
-            organizationId,
             updatedAt: serverTimestamp()
         };
 
-        await setDoc(doc(db, 'participants', participantId, 'lastEngagement', 'current'), lastEngagementData);
+        await setDoc(
+            doc(db, 'organizations', organizationId, 'participants', participantId, 'lastEngagement', 'current'),
+            lastEngagementData
+        );
+
         onComplete();
     };
 

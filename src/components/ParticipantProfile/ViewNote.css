@@ -1,0 +1,64 @@
+.view-note {
+    padding: 16px;
+    height: 100%;
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.close-button {
+    padding: 8px 16px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.note-info {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.info-row {
+    display: flex;
+    gap: 16px;
+}
+
+.info-column {
+    flex: 1;
+}
+
+.info-column h4 {
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.info-card {
+    background: white;
+    padding: 16px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.note-content {
+    flex: 1;
+}
+
+.note-content h4 {
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.content-card {
+    background: white;
+    padding: 16px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-height: 200px;
+}

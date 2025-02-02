@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, getDocs, addDoc, serverTimestamp, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, addDoc, serverTimestamp} from 'firebase/firestore';
 import { useOrganization } from '../../context/OrganizationContext';
+import { format } from 'date-fns';
 
 interface ParticipantAssignmentsFormProps {
     participantId: string;
@@ -35,39 +36,35 @@ export const ParticipantAssignmentsForm: React.FC<ParticipantAssignmentsFormProp
 
     const loadPrograms = async () => {
         const db = getFirestore();
-        const programsQuery = query(
-            collection(db, 'programs'),
-            where('organizationId', '==', organizationId)
-        );
-        const snapshot = await getDocs(programsQuery);
+        const programsRef = collection(db, 'organizations', organizationId, 'programs');
+        const snapshot = await getDocs(programsRef);
         const programsList = snapshot.docs.map(doc => ({
             id: doc.id,
             program: doc.data() as Program
         }));
         setPrograms(programsList);
     };
-
     const saveParticipantPrograms = async () => {
         const db = getFirestore();
 
         const selectedProgramDetails = Array.from(selectedPrograms).map(programId => {
             const program = programs.find(p => p.id === programId)?.program;
+            const currentDate = new Date();
             return {
                 programId,
                 programName: program?.name || '',
-                assignedAt: new Date()
+                assignedAt: format(currentDate, 'MM/dd/yyyy')
             };
         });
 
         const programData = {
             programs: selectedProgramDetails,
-            organizationId,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
         };
 
         await addDoc(
-            collection(db, 'participants', participantId, 'participantProgram'),
+            collection(db, 'organizations', organizationId, 'participants', participantId, 'participantProgram'),
             programData
         );
 

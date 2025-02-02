@@ -1,0 +1,108 @@
+.report-options {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.report-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.report-type-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 24px 0;
+}
+
+.report-type-button {
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.report-type-button:hover {
+    background-color: #0056b3;
+}
+
+.report-type-button.selected {
+    background-color: #0056b3;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #007bff;
+}
+
+.back-button, .view-past-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover, .view-past-button:hover {
+    background-color: #0056b3;
+}
+
+.reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.report-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    /* Removed background, border-radius, and border */
+}
+
+.download-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.download-button:hover {
+    background-color: #0056b3;
+}
+
+.program-select {
+    width: 300px;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+.select-prompt {
+    text-align: center;
+    color: #666;
+    margin: 40px 0;
+}
+h3 {
+    text-align: center;
+    margin: 20px 0;
+}

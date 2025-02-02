@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { getFirestore, collection, doc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { useOrganization } from '../../context/OrganizationContext';
+import { format } from 'date-fns';
 
 interface ParticipantInformationFormProps {
     onComplete: (id: string) => void;
-    organizationId: string;  // Add this line
+    organizationId: string;
 }
 
 export const ParticipantInformationForm: React.FC<ParticipantInformationFormProps> = ({ onComplete }) => {
@@ -17,39 +18,33 @@ export const ParticipantInformationForm: React.FC<ParticipantInformationFormProp
         const db = getFirestore();
         const batch = writeBatch(db);
 
-        const participantRef = doc(collection(db, 'participants'));
+        const participantRef = doc(collection(db, 'organizations', organizationId, 'participants'));
         const participantId = participantRef.id;
 
         const participantData = {
             firstName,
             lastName,
-            dateOfBirth,
-            organizationId,
+            dateOfBirth: dateOfBirth ? format(new Date(dateOfBirth), 'MM/dd/yyyy') : '',
             createdAt: serverTimestamp()
         };
         batch.set(participantRef, participantData);
 
-        // Initialize subcollections with organizationId
-        batch.set(doc(collection(participantRef, 'participantInformation')), {
+        batch.set(doc(participantRef, 'participantInformation', 'details'), {
             firstName,
             lastName,
-            dateOfBirth,
-            organizationId,
+            dateOfBirth: dateOfBirth ? format(new Date(dateOfBirth), 'MM/dd/yyyy') : '',
             createdAt: serverTimestamp()
         });
 
-        batch.set(doc(collection(participantRef, 'participantLocation')), {
-            organizationId,
+        batch.set(doc(participantRef, 'participantLocation', 'current'), {
             createdAt: serverTimestamp()
         });
 
-        batch.set(doc(collection(participantRef, 'participantProgram')), {
-            organizationId,
+        batch.set(doc(participantRef, 'participantProgram', 'current'), {
             createdAt: serverTimestamp()
         });
 
-        batch.set(doc(collection(participantRef, 'participantServices')), {
-            organizationId,
+        batch.set(doc(participantRef, 'participantServices', 'current'), {
             createdAt: serverTimestamp()
         });
 

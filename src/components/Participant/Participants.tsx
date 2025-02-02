@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { useOrganization } from '../../context/OrganizationContext';
 import './Participants.css';
 
 interface ParticipantsProps {
     onNewIntake: () => void;
     onViewParticipant: (id: string) => void;
+    organizationId?: string;
 }
 
 interface Participant {
@@ -19,7 +20,7 @@ interface Participant {
 }
 
 export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewParticipant }) => {
-    const { organizationId } = useOrganization();
+    const {organizationId} = useOrganization();
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -33,12 +34,8 @@ export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewP
     const fetchParticipants = async () => {
         const db = getFirestore();
         try {
-            const participantsRef = collection(db, 'participants');
-            const participantsQuery = query(
-                participantsRef,
-                where('organizationId', '==', organizationId)
-            );
-            const participantsSnapshot = await getDocs(participantsQuery);
+            const participantsRef = collection(db, 'organizations', organizationId, 'participants');
+            const participantsSnapshot = await getDocs(participantsRef);
 
             const participantsData = await Promise.all(participantsSnapshot.docs.map(async (doc) => {
                 const participant = doc.data();
@@ -70,7 +67,7 @@ export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewP
                     location,
                     lastEngagementDate,
                     currentProgram,
-                    organizationId: participant.organizationId
+                    organizationId // Include organizationId from the current context
                 };
             }));
 
@@ -82,7 +79,8 @@ export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewP
         }
     };
 
-const handleViewParticipant = (participantId: string) => {
+
+    const handleViewParticipant = (participantId: string) => {
         onViewParticipant(participantId);
     };
 
@@ -115,7 +113,7 @@ const handleViewParticipant = (participantId: string) => {
                 <button className="search-button">Search</button>
             </div>
 
-            <div className="participants-table">
+            <div className="participants-table" data-component="participants-table">
                 <div className="table-header">
                     <div className="header-cell">Participant Name</div>
                     <div className="header-cell">Location</div>

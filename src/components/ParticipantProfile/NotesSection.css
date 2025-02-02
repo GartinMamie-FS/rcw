@@ -1,0 +1,73 @@
+.notes-section {
+    padding: 20px;
+    width: 100%;
+}
+
+.notes-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.notes-section .add-button {
+    padding: 8px 16px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.notes-section .notes-table {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+
+.notes-section .table-header {
+    display: flex;
+    background-color: #f5f5f5;
+    padding: 12px;
+    font-weight: bold;
+}
+
+.notes-section .table-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.notes-section .table-row {
+    display: flex;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.notes-section .table-cell {
+    padding: 0 8px;
+}
+
+.notes-section .note-content {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notes-section .view-button {
+    padding: 4px 12px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.notes-section .view-button {
+    padding: 4px 12px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.notes-section .view-button:hover {
+    background-color: #1565c0;
+}

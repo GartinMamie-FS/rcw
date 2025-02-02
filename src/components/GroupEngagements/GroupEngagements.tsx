@@ -36,13 +36,9 @@ export const GroupEngagementsScreen: React.FC<{
 
     const loadServices = async () => {
         if (!organizationId) return;
-
         const db = getFirestore();
-        const servicesQuery = query(
-            collection(db, 'services'),
-            where('organizationId', '==', organizationId)
-        );
-        const servicesSnapshot = await getDocs(servicesQuery);
+        const servicesRef = collection(db, 'organizations', organizationId, 'services');
+        const servicesSnapshot = await getDocs(servicesRef);
         const servicesList = servicesSnapshot.docs.map(doc => doc.data().name).filter(Boolean);
         setServices(servicesList);
     };
@@ -53,40 +49,63 @@ export const GroupEngagementsScreen: React.FC<{
         const db = getFirestore();
         const currentDate = format(new Date(), 'MM/dd/yyyy');
 
+        // Get the service from the organization's services collection
         const serviceQuery = query(
-            collection(db, 'services'),
-            where('name', '==', selectedService),
-            where('organizationId', '==', organizationId)
+            collection(db, 'organizations', organizationId, 'services'),
+            where('name', '==', selectedService)
         );
-        const serviceDoc = (await getDocs(serviceQuery)).docs[0];
-        const serviceId = serviceDoc.id;
+        const serviceSnapshot = await getDocs(serviceQuery);
+        if (serviceSnapshot.empty) return;
 
-        for (const participant of selectedParticipants.filter((p: ParticipantWithSelection) => p.isSelected)) {
-            await addDoc(
-                collection(db, 'participants', participant.id, 'participantServices'),
-                {
-                    createdAt: new Date(),
-                    organizationId,
-                    services: [{
-                        serviceId,
-                        serviceName: selectedService
-                    }]
-                }
+        const serviceId = serviceSnapshot.docs[0].id;
+        const serviceName = serviceSnapshot.docs[0].data().name;
+
+        // Save for each selected participant
+        const selectedOnes = selectedParticipants.filter(p => p.isSelected);
+
+        for (const participant of selectedOnes) {
+            // Add to participantServices subcollection
+            const participantServicesRef = collection(
+                db,
+                'organizations',
+                organizationId,
+                'participants',
+                participant.id,
+                'participantServices'
             );
 
-            await setDoc(
-                doc(db, 'participants', participant.id, 'lastEngagement', 'current'),
-                {
-                    date: currentDate,
-                    type: 'service',
-                    organizationId,
-                    updatedAt: new Date()
-                }
+            await addDoc(participantServicesRef, {
+                createdAt: new Date(),
+                date: currentDate,
+                services: [{
+                    serviceId,
+                    serviceName,
+                    count: 1
+                }]
+            });
+
+            // Update lastEngagement
+            const lastEngagementRef = doc(
+                db,
+                'organizations',
+                organizationId,
+                'participants',
+                participant.id,
+                'lastEngagement',
+                'current'
             );
+
+            await setDoc(lastEngagementRef, {
+                date: currentDate,
+                type: 'service',
+                updatedAt: new Date()
+            });
         }
 
         setShowSuccessDialog(true);
     };
+
+
     return (
         <div className="group-engagements">
             <h2>Group Engagements</h2>

@@ -46,7 +46,7 @@
     overflow: hidden;
 }
 
-.table-header {
+[data-component="participants-table"] .table-header {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 0.5fr;
     background-color: #f5f5f5;
@@ -54,7 +54,7 @@
     font-weight: bold;
 }
 
-.table-row {
+[data-component="participants-table"] .table-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 0.5fr;
     padding: 15px;

@@ -1,0 +1,128 @@
+.recaps-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+}
+
+.create-button, .manage-types-button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.create-button {
+    background-color: #1976d2;
+    color: white;
+}
+
+.manage-types-button {
+    background-color: #2e7d32;
+    color: white;
+}
+
+.recaps-table {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 100px;
+    padding: 16px;
+    background-color: #f5f5f5;
+    border-radius: 8px 8px 0 0;
+    font-weight: 600;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 100px;
+    padding: 16px;
+    border-top: 1px solid #eee;
+    align-items: center;
+}
+
+.view-button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.create-recap-form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+select.form-input[multiple] {
+    height: 120px;
+}
+
+.button-container {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.form-button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.form-button:first-child {
+    background-color: #1976d2;
+    color: white;
+}
+
+.form-button:last-child {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+}
+
+.form-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

@@ -8,10 +8,17 @@ interface OrganizationContextType {
 const OrganizationContext = createContext<OrganizationContextType | undefined>(undefined);
 
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [organizationId, setOrganizationId] = useState('');
+    const [organizationId, setOrganizationId] = useState(() => {
+        return localStorage.getItem('currentOrganizationId') || '';
+    });
+
+    const updateOrganizationId = (id: string) => {
+        localStorage.setItem('currentOrganizationId', id);
+        setOrganizationId(id);
+    };
 
     return (
-        <OrganizationContext.Provider value={{ organizationId, setOrganizationId }}>
+        <OrganizationContext.Provider value={{ organizationId, setOrganizationId: updateOrganizationId }}>
             {children}
         </OrganizationContext.Provider>
     );

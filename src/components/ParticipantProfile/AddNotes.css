@@ -1,0 +1,121 @@
+.add-notes {
+    height: 100%;
+    padding: 24px;
+    font-size: 16px;
+}
+
+.notes-layout {
+    display: flex;
+    gap: 24px;
+    height: 100%;
+}
+
+.nav-panel {
+    width: 300px;
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.nav-panel h3 {
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.nav-links button {
+    text-align: left;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+.nav-links button.active {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.content-area {
+    flex: 1;
+    background: white;
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.content-area h3 {
+    font-size: 24px;
+    margin-bottom: 24px;
+}
+
+.section {
+    margin-top: 32px;
+}
+
+.form-group {
+    margin-bottom: 32px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.services-list {
+    margin: 24px 0;
+}
+
+.service-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    font-size: 16px;
+}
+
+.service-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+.continue-button,
+.save-button {
+    float: right;
+    padding: 12px 24px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.required-text {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 24px;
+}

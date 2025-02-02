@@ -1,0 +1,53 @@
+.create-program-form {
+    padding: 24px;
+}
+
+.create-program-form h2 {
+    text-align: center;
+    margin-bottom: 32px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.button-container {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.form-button {
+    min-width: 120px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.form-button[type="submit"] {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+}
+
+.form-button[type="button"] {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+}

@@ -1,38 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../../config/firebase';
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
-
-interface Organization {
-    id: string;
-    name: string;
-}
+import React, { useState } from 'react';
+import { getFirestore } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { auth } from '../../config/firebase';
+import './AddStaffScreen.css';
+import { useOrganization } from '../../context/OrganizationContext';
 
 export const AddStaffScreen: React.FC = () => {
-    const [organizations, setOrganizations] = useState<Organization[]>([]);
-    const [selectedOrg, setSelectedOrg] = useState('');
+    const db = getFirestore();
+    const { organizationId } = useOrganization();
     const [staffEmail, setStaffEmail] = useState('');
+    const [staffPassword, setStaffPassword] = useState('');
     const [staffRole, setStaffRole] = useState('staff');
-
-    useEffect(() => {
-        fetchOrganizations();
-    }, []);
-
-    const fetchOrganizations = async () => {
-        const querySnapshot = await getDocs(collection(db, 'organizations'));
-        const orgs = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            name: doc.data().name
-        }));
-        setOrganizations(orgs);
-    };
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [currentAdminPassword, setCurrentAdminPassword] = useState('');
 
     const handleAddStaff = async (e: React.FormEvent) => {
         e.preventDefault();
-
         try {
-            // Check if user already exists
+            const currentUser = auth.currentUser;
+
             const userQuery = query(
-                collection(db, 'users'),
+                collection(db, 'organizations', organizationId, 'users'),
                 where('email', '==', staffEmail)
             );
             const userSnapshot = await getDocs(userQuery);
@@ -42,65 +32,111 @@ export const AddStaffScreen: React.FC = () => {
                 return;
             }
 
-            // Add new staff member
-            await addDoc(collection(db, 'users'), {
+            await signOut(auth);
+
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                staffEmail,
+                staffPassword
+            );
+
+            await setDoc(doc(db, 'organizations', organizationId, 'users', userCredential.user.uid), {
+                uid: userCredential.user.uid,
                 email: staffEmail,
-                organizationId: selectedOrg,
+                firstName,
+                lastName,
                 role: staffRole,
                 createdAt: new Date()
             });
 
-            // Reset form
+            await signOut(auth);
+
+            if (currentUser) {
+                await signInWithEmailAndPassword(auth, currentUser.email!, currentAdminPassword);
+            }
+
             setStaffEmail('');
-            setSelectedOrg('');
+            setStaffPassword('');
             setStaffRole('staff');
+            setFirstName('');
+            setLastName('');
+            setCurrentAdminPassword('');
             alert('Staff member added successfully!');
         } catch (error) {
-            console.error('Error adding staff:', error);
-            alert('Error adding staff member');
+            console.error('Detailed error:', error);
+            alert('Error adding staff member. Check console for details.');
         }
     };
 
     return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold mb-6">Add Staff Member</h2>
+        <div className="add-staff-screen">
+            <div className="staff-form">
+                <h2>Add Staff Member</h2>
+                <p className="required-text">* indicates required field</p>
 
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <form onSubmit={handleAddStaff} className="space-y-4">
-                    <div>
-                        <label className="block mb-2">Organization:</label>
-                        <select
-                            value={selectedOrg}
-                            onChange={(e) => setSelectedOrg(e.target.value)}
-                            className="w-full p-2 border rounded"
-                            required
-                        >
-                            <option value="">Select Organization</option>
-                            {organizations.map((org) => (
-                                <option key={org.id} value={org.id}>
-                                    {org.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block mb-2">Staff Email:</label>
+                <form onSubmit={handleAddStaff}>
+                    <div className="form-group">
+                        <label>First Name *</label>
                         <input
-                            type="email"
-                            value={staffEmail}
-                            onChange={(e) => setStaffEmail(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            type="text"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            className="form-input"
                             required
                         />
                     </div>
 
-                    <div>
-                        <label className="block mb-2">Role:</label>
+                    <div className="form-group">
+                        <label>Last Name *</label>
+                        <input
+                            type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className="form-input"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Staff Email *</label>
+                        <input
+                            type="email"
+                            value={staffEmail}
+                            onChange={(e) => setStaffEmail(e.target.value)}
+                            className="form-input"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Staff Password *</label>
+                        <input
+                            type="password"
+                            value={staffPassword}
+                            onChange={(e) => setStaffPassword(e.target.value)}
+                            className="form-input"
+                            required
+                            minLength={6}
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Your Password (Required to maintain session) *</label>
+                        <input
+                            type="password"
+                            value={currentAdminPassword}
+                            onChange={(e) => setCurrentAdminPassword(e.target.value)}
+                            className="form-input"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Role *</label>
                         <select
                             value={staffRole}
                             onChange={(e) => setStaffRole(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             required
                         >
                             <option value="staff">Staff</option>
@@ -110,7 +146,8 @@ export const AddStaffScreen: React.FC = () => {
 
                     <button
                         type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        className="save-button"
+                        disabled={!staffEmail || !staffPassword || !firstName || !lastName || !currentAdminPassword}
                     >
                         Add Staff Member
                     </button>

@@ -13,9 +13,15 @@
     "vite": "^6.0.5"
   },
   "dependencies": {
+    "@types/jspdf": "^2.0.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/uuid": "^10.0.0",
     "date-fns": "^4.1.0",
-    "firebase": "^11.2.0"
+    "firebase": "^11.2.0",
+    "jspdf": "^2.5.2",
+    "react-router-dom": "^7.1.4",
+    "uuid": "^11.0.5"
   }
 }

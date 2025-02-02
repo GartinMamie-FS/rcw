@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs} from 'firebase/firestore';
 import { useOrganization } from '../../context/OrganizationContext';
 import './GroupEngagements.css';
 
@@ -17,7 +17,6 @@ interface ParticipantSelectionProps {
 }
 
 export const ParticipantSelectionContent: React.FC<ParticipantSelectionProps> = ({
-                                                                                     serviceName,
                                                                                      participants,
                                                                                      onParticipantsSelected
                                                                                  }) => {
@@ -28,11 +27,8 @@ export const ParticipantSelectionContent: React.FC<ParticipantSelectionProps> = 
         const loadParticipants = async () => {
             if (localParticipants.length === 0 && organizationId) {
                 const db = getFirestore();
-                const participantsQuery = query(
-                    collection(db, 'participants'),
-                    where('organizationId', '==', organizationId)
-                );
-                const snapshot = await getDocs(participantsQuery);
+                const participantsRef = collection(db, 'organizations', organizationId, 'participants');
+                const snapshot = await getDocs(participantsRef);
                 const participantsList = snapshot.docs.map(doc => ({
                     id: doc.id,
                     firstName: doc.data().firstName,
@@ -57,7 +53,7 @@ export const ParticipantSelectionContent: React.FC<ParticipantSelectionProps> = 
 
     return (
         <div className="participant-selection">
-            <h3>{serviceName}</h3>
+            <h3>Choose Engaged Peers</h3>
             <div className="participants-list">
                 {localParticipants.map(participant => (
                     <div key={participant.id} className="participant-item">
