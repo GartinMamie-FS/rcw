@@ -29,11 +29,11 @@ interface RecapWithId {
     recap: Recap;
     date: string;
 }
-
 interface CreateOrganizationRecapScreenProps {
+    onBack: () => void;
 }
 
-export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScreenProps> = ({}) => {
+export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScreenProps> = ({ onBack }) => {
     const { organizationId } = useOrganization();
     const [recapName, setRecapName] = useState('');
     const [selectedRecapType, setSelectedRecapType] = useState<RecapType | null>(null);
@@ -181,6 +181,7 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
     return (
         <div className="create-recap-screen">
             <div className="header-container">
+                <button className="back-button" onClick={onBack}>Back</button>
                 <h2>Create Organization Recap</h2>
             </div>
 
