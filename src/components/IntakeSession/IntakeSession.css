@@ -1,89 +1,120 @@
-.intake-session {
+.intake-session-component {
     padding: 24px;
     height: 100%;
 }
 
-.intake-content {
+.intake-session-component .header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.intake-session-component .header h2 {
+    margin: 0;
+    text-align: center;
+}
+
+.intake-session-component .header .close-button {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.intake-session-component .intake-content {
     display: flex;
     gap: 24px;
     height: calc(100% - 60px);
     margin-top: 24px;
 }
 
-.navigation-panel {
+.intake-session-component .navigation-panel {
     width: 250px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
-.nav-links {
+.intake-session-component .nav-links {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.participant-form {
+.intake-session-component .participant-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-.required-text {
+.intake-session-component .required-text {
     color: #666;
     font-size: 0.9rem;
 }
 
-.form-group {
+.intake-session-component .form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.form-group label {
+.intake-session-component .form-group label {
     font-weight: 500;
 }
 
-.form-input {
+.intake-session-component .form-input {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
 }
 
-.save-button {
+.intake-session-component .save-button {
     align-self: flex-end;
-    padding: 10px 20px;
+    padding: 8px 16px;
     background-color: #1976d2;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    font-size: 0.9rem;
 }
 
-.save-button:disabled {
+
+.intake-session-component .save-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
-.session-form {
+.intake-session-component .session-form {
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.form-section {
+.intake-session-component .form-section {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-.custom-select {
+.intake-session-component .custom-select {
     position: relative;
     width: 100%;
 }
 
-.select-header {
+.intake-session-component .select-header {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -93,7 +124,7 @@
     cursor: pointer;
 }
 
-.select-options {
+.intake-session-component .select-options {
     position: absolute;
     top: 100%;
     left: 0;
@@ -106,24 +137,24 @@
     z-index: 1000;
 }
 
-.select-option {
+.intake-session-component .select-option {
     padding: 10px;
     cursor: pointer;
 }
 
-.select-option:hover {
+.intake-session-component .select-option:hover {
     background-color: #f5f5f5;
 }
 
-.arrow {
+.intake-session-component .arrow {
     transition: transform 0.2s;
 }
 
-.arrow.up {
+.intake-session-component .arrow.up {
     transform: rotate(180deg);
 }
 
-.nav-link {
+.intake-session-component .nav-link {
     text-align: left;
     padding: 12px;
     border: none;
@@ -133,16 +164,16 @@
     transition: background-color 0.2s;
 }
 
-.nav-link:hover {
+.intake-session-component .nav-link:hover {
     background-color: #f5f5f5;
 }
 
-.nav-link.active {
+.intake-session-component .nav-link.active {
     color: #1976d2;
     background-color: #e3f2fd;
 }
 
-.submit-button {
+.intake-session-component .submit-button {
     width: 100%;
     padding: 12px;
     background-color: #1976d2;
@@ -153,12 +184,12 @@
     margin-top: auto;
 }
 
-.submit-button.disabled {
+.intake-session-component .submit-button.disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
-.form-content {
+.intake-session-component .form-content {
     flex: 1;
     background: white;
     border-radius: 8px;
@@ -166,18 +197,18 @@
     padding: 24px;
 }
 
-.assignments-form {
+.intake-session-component .assignments-form {
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.multi-select {
+.intake-session-component .multi-select {
     position: relative;
     width: 100%;
 }
 
-.select-option {
+.intake-session-component .select-option {
     display: flex;
     gap: 10px;
     align-items: center;
@@ -185,10 +216,10 @@
     cursor: pointer;
 }
 
-.select-option:hover {
+.intake-session-component .select-option:hover {
     background-color: #f5f5f5;
 }
 
-.select-option input[type="checkbox"] {
+.intake-session-component .select-option input[type="checkbox"] {
     margin: 0;
 }

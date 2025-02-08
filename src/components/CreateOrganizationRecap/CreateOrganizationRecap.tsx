@@ -30,6 +30,7 @@ interface RecapWithId {
     date: string;
 }
 interface CreateOrganizationRecapScreenProps {
+    organizationId: string;
     onBack: () => void;
 }
 
@@ -179,16 +180,16 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
     };
 
     return (
-        <div className="create-recap-screen">
-            <div className="header-container">
-                <button className="back-button" onClick={onBack}>Back</button>
-                <h2>Create Organization Recap</h2>
+        <div className="org-recap-screen">
+            <div className="org-recap-header">
+                <button className="org-recap-back-button" onClick={onBack}>Back</button>
+                <h2>Report Public Awareness/Impact</h2>
             </div>
 
-            <div className="form-container">
+            <div className="org-recap-form-container">
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Recap Type</label>
+                    <div className="org-recap-form-group">
+                        <label>Public Awareness/Impact</label>
                         <select
                             value={selectedRecapType?.id || ''}
                             onChange={(e) => {
@@ -196,7 +197,7 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
                                 setSelectedRecapType(selected || null);
                                 setFormData({});
                             }}
-                            className="form-input"
+                            className="org-recap-input"
                             required
                         >
                             <option value="">Select a recap type</option>
@@ -209,14 +210,14 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
                     </div>
 
                     {selectedRecapType && (
-                        <div className="form-group">
-                            <label>Recap Name</label>
+                        <div className="org-recap-form-group">
+                            <label>Activity Name</label>
                             <input
                                 type="text"
                                 value={recapName}
                                 onChange={(e) => setRecapName(e.target.value)}
-                                placeholder="Enter recap name"
-                                className="form-input"
+                                placeholder="Enter activity name"
+                                className="org-recap-input"
                                 required
                             />
                         </div>
@@ -224,10 +225,10 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
 
                     {renderFormFields()}
 
-                    <div className="button-container">
+                    <div className="org-recap-button-container">
                         <button
                             type="submit"
-                            className="submit-button"
+                            className="org-recap-submit-button"
                             disabled={!recapName.trim() || !organizationId || !selectedRecapType}
                         >
                             Create Recap
@@ -236,9 +237,9 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
                 </form>
             </div>
 
-            <div className="recaps-list">
+            <div className="org-recap-list">
                 <h3>Recent Organization Recaps</h3>
-                <table className="recaps-table">
+                <table className="org-recap-table">
                     <thead>
                     <tr>
                         <th>Date</th>
@@ -255,7 +256,7 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
                             <td>{recap.recap.recapTypeName}</td>
                             <td>
                                 <button
-                                    className="view-button"
+                                    className="org-recap-view-button"
                                     onClick={() => handleViewDetails(recap)}
                                 >
                                     View
@@ -268,30 +269,30 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
             </div>
 
             {selectedRecap && (
-                <div className="modal" onClick={() => setSelectedRecap(null)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
+                <div className="org-recap-modal" onClick={() => setSelectedRecap(null)}>
+                    <div className="org-recap-modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="org-recap-modal-header">
                             <h2>{selectedRecap.recap.name}</h2>
                             <button
-                                className="close-button"
+                                className="org-recap-close-button"
                                 onClick={() => setSelectedRecap(null)}
                             >
                                 ×
                             </button>
                         </div>
-                        <div className="modal-body">
+                        <div className="org-recap-modal-body">
                             <p><strong>Date:</strong> {selectedRecap.date}</p>
                             <p><strong>Type:</strong> {selectedRecap.recap.recapTypeName}</p>
                             <h3>Fields:</h3>
                             {Object.entries(selectedRecap.recap.fields).map(([key, value]) => (
-                                <div key={key} className="field-item">
+                                <div key={key} className="org-recap-field-item">
                                     <strong>{key}:</strong> {String(value)}
                                 </div>
                             ))}
                         </div>
-                        <div className="modal-footer">
+                        <div className="org-recap-modal-footer">
                             <button
-                                className="dismiss-button"
+                                className="org-recap-dismiss-button"
                                 onClick={() => setSelectedRecap(null)}
                             >
                                 Close

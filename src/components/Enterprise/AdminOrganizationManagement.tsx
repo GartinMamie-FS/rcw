@@ -3,29 +3,36 @@ import { AddStaffScreen } from './AddStaffScreen';
 import { ViewStaffScreen } from './ViewStaffScreen';
 import './AdminOrganizationManagement.css';
 
-export const AdminOrganizationManagement: React.FC = () => {
+interface AdminOrganizationManagementProps {
+    organizationId: string;
+}
+
+export const AdminOrganizationManagement: React.FC<AdminOrganizationManagementProps> = ({ organizationId }) => {
     const [selectedView, setSelectedView] = useState<'add' | 'view'>('add');
 
     return (
-        <div className="admin-org-management">
-            <div className="navigation-panel">
-                <div className="nav-links">
+        <div className="org-management-container">
+            <div className="org-management-nav-panel">
+                <div className="org-management-nav-links">
                     <button
-                        className={`nav-link ${selectedView === 'add' ? 'active' : ''}`}
+                        className={`org-management-nav-button ${selectedView === 'add' ? 'active' : ''}`}
                         onClick={() => setSelectedView('add')}
                     >
                         Add Staff
                     </button>
                     <button
-                        className={`nav-link ${selectedView === 'view' ? 'active' : ''}`}
+                        className={`org-management-nav-button ${selectedView === 'view' ? 'active' : ''}`}
                         onClick={() => setSelectedView('view')}
                     >
                         View Staff
                     </button>
                 </div>
             </div>
-            <div className="content-panel">
-                {selectedView === 'add' ? <AddStaffScreen /> : <ViewStaffScreen />}
+            <div className="org-management-content">
+                {selectedView === 'add' ?
+                    <AddStaffScreen organizationId={organizationId} /> :
+                    <ViewStaffScreen organizationId={organizationId} />
+                }
             </div>
         </div>
     );

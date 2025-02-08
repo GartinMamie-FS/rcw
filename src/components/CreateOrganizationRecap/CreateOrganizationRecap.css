@@ -1,14 +1,33 @@
-.create-recap-screen {
+.org-recap-screen {
     padding: 24px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-.header-container {
-    margin-bottom: 24px;
+.org-recap-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 32px;
 }
 
-.form-container {
+.org-recap-back-button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #1976d2;
+    cursor: pointer;
+    padding: 8px;
+    margin-right: 16px;
+}
+
+.org-recap-header h2 {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
+
+/* Rest of your existing CSS remains the same */
+.org-recap-form-container {
     background: white;
     padding: 24px;
     border-radius: 8px;
@@ -16,18 +35,18 @@
     margin-bottom: 24px;
 }
 
-.form-group {
+.org-recap-form-group {
     margin-bottom: 20px;
 }
 
-.form-group label {
+.org-recap-form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
     color: #333;
 }
 
-.form-input {
+.org-recap-input {
     width: 100%;
     padding: 8px 12px;
     border: 1px solid #ddd;
@@ -35,17 +54,17 @@
     font-size: 16px;
 }
 
-select.form-input[multiple] {
+select.org-recap-input[multiple] {
     height: 120px;
 }
 
-.button-container {
+.org-recap-button-container {
     margin-top: 24px;
     display: flex;
     justify-content: flex-end;
 }
 
-.submit-button {
+.org-recap-submit-button {
     padding: 10px 20px;
     background-color: #1976d2;
     color: white;
@@ -55,12 +74,12 @@ select.form-input[multiple] {
     font-weight: 500;
 }
 
-.submit-button:disabled {
+.org-recap-submit-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
-.recaps-list {
+.org-recap-list {
     margin-top: 2rem;
     padding: 1rem;
     background: white;
@@ -68,29 +87,29 @@ select.form-input[multiple] {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.recaps-table {
+.org-recap-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
 }
 
-.recaps-table th,
-.recaps-table td {
+.org-recap-table th,
+.org-recap-table td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #eee;
 }
 
-.recaps-table th {
+.org-recap-table th {
     background-color: #f5f5f5;
     font-weight: 600;
 }
 
-.recaps-table tr:hover {
+.org-recap-table tr:hover {
     background-color: #f9f9f9;
 }
-/* Add these new styles to your existing CSS */
-.view-button {
+
+.org-recap-view-button {
     padding: 6px 12px;
     background-color: #1976d2;
     color: white;
@@ -99,7 +118,7 @@ select.form-input[multiple] {
     cursor: pointer;
 }
 
-.modal {
+.org-recap-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -112,7 +131,7 @@ select.form-input[multiple] {
     z-index: 1000;
 }
 
-.modal-content {
+.org-recap-modal-content {
     background: white;
     padding: 20px;
     border-radius: 8px;
@@ -122,14 +141,14 @@ select.form-input[multiple] {
     overflow-y: auto;
 }
 
-.modal-header {
+.org-recap-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.close-button {
+.org-recap-close-button {
     background: none;
     border: none;
     font-size: 24px;
@@ -137,18 +156,19 @@ select.form-input[multiple] {
     padding: 0 8px;
 }
 
-.field-item {
+.org-recap-field-item {
     margin: 10px 0;
     padding: 8px;
     background: #f5f5f5;
     border-radius: 4px;
 }
-.modal-footer {
+
+.org-recap-modal-footer {
     margin-top: 20px;
     text-align: right;
 }
 
-.dismiss-button {
+.org-recap-dismiss-button {
     padding: 8px 16px;
     background-color: #666;
     color: white;
@@ -157,6 +177,6 @@ select.form-input[multiple] {
     cursor: pointer;
 }
 
-.dismiss-button:hover {
+.org-recap-dismiss-button:hover {
     background-color: #555;
 }

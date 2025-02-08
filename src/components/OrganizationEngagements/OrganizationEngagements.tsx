@@ -31,8 +31,9 @@ export const OrganizationEngagements = () => {
 
     const renderContent = () => {
         if (userRole === 'admin') {
-            return <AddStaffScreen />;
+            return <AddStaffScreen organizationId={organizationId} />;
         }
+
 
         switch (currentView) {
             case 'dashboard':

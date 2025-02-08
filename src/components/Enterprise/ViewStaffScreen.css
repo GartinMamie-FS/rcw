@@ -1,8 +1,8 @@
-.view-staff-screen {
+.view-staff-container {
     padding: 24px;
 }
 
-.staff-table {
+.view-staff-members-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
@@ -11,19 +11,19 @@
     border-radius: 8px;
 }
 
-.staff-table th,
-.staff-table td {
+.view-staff-members-table th,
+.view-staff-members-table td {
     padding: 16px;
     text-align: left;
     border-bottom: 1px solid #eee;
 }
 
-.staff-table th {
+.view-staff-members-table th {
     background-color: #f8f9fa;
     font-weight: 600;
 }
 
-.view-button {
+.view-staff-action-button {
     background-color: #1976d2;
     color: white;
     border: none;
@@ -33,7 +33,7 @@
     margin-right: 8px;
 }
 
-.delete-button {
+.view-staff-delete-button {
     background-color: #dc3545;
     color: white;
     border: none;
@@ -42,10 +42,10 @@
     cursor: pointer;
 }
 
-.view-button:hover {
+.view-staff-action-button:hover {
     background-color: #1565c0;
 }
 
-.delete-button:hover {
+.view-staff-delete-button:hover {
     background-color: #c82333;
 }

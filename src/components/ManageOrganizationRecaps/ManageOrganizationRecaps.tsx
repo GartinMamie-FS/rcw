@@ -2,16 +2,22 @@ import React from 'react';
 import { ManageRecapTypes } from '../ManageRecapTypes';
 import './ManageOrganizationRecaps.css';
 
-export const ManageOrganizationRecapsScreen: React.FC = () => {
+interface ManageOrganizationRecapsScreenProps {
+    organizationId: string;
+}
+
+export const ManageOrganizationRecapsScreen: React.FC<ManageOrganizationRecapsScreenProps> = ({ organizationId }) => {
     return (
         <div className="manage-organization-screen">
             <div className="header-container">
-                <h2>Manage Recap Types</h2>
-                <p>Create and configure templates for your organization's recaps</p>
+                <h2>Public Awareness/Impact Reports</h2>
+                <p>Create and configure templates for your organization's reports (Examples: Community Collaboration, Narcan Distribution)</p>
             </div>
             <div className="content-container">
-                <ManageRecapTypes />
+                <ManageRecapTypes organizationId={organizationId} />
             </div>
         </div>
     );
 };
+
+

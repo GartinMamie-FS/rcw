@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc, getDoc} from 'firebase/firestore';
-import { useOrganization } from '../../context/OrganizationContext';
 import './ManageLocationScreen.css';
 import { LocationForm } from './LocationForm';
 
@@ -14,8 +13,12 @@ interface LocationWithId {
     location: Location;
 }
 
-export const ManageLocationsScreen: React.FC = () => {
-    //const { organizationId } = useOrganization();
+interface ManageLocationsScreenProps {
+    organizationId: string;
+}
+
+
+export const ManageLocationsScreen: React.FC<ManageLocationsScreenProps> = ({ organizationId }) => {
     const [showLocationForm, setShowLocationForm] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
@@ -23,6 +26,7 @@ export const ManageLocationsScreen: React.FC = () => {
         if (showLocationForm) {
             return (
                 <LocationForm
+                    organizationId={organizationId}
                     onSaveComplete={() => setShowLocationForm(false)}
                 />
             );
@@ -31,6 +35,7 @@ export const ManageLocationsScreen: React.FC = () => {
         if (selectedLocationId) {
             return (
                 <LocationDetailsScreen
+                    organizationId={organizationId}
                     locationId={selectedLocationId}
                     onBack={() => setSelectedLocationId(null)}
                 />
@@ -38,7 +43,7 @@ export const ManageLocationsScreen: React.FC = () => {
         }
 
         return (
-            <div className="locations-container">
+            <div className="manage-locations-screen">
                 <div className="header-container">
                     <h2>Manage Locations</h2>
                     <button
@@ -49,6 +54,7 @@ export const ManageLocationsScreen: React.FC = () => {
                     </button>
                 </div>
                 <LocationsTable
+                    organizationId={organizationId}
                     onNavigateToDetails={(locationId) => setSelectedLocationId(locationId)}
                 />
             </div>
@@ -58,10 +64,12 @@ export const ManageLocationsScreen: React.FC = () => {
     return renderContent();
 };
 
-const LocationsTable: React.FC<{
+interface LocationsTableProps {
+    organizationId: string;
     onNavigateToDetails: (locationId: string) => void;
-}> = ({ onNavigateToDetails }) => {
-    const { organizationId } = useOrganization();
+}
+
+const LocationsTable: React.FC<LocationsTableProps> = ({ organizationId, onNavigateToDetails }) => {
     const [locations, setLocations] = useState<LocationWithId[]>([]);
 
     useEffect(() => {
@@ -81,33 +89,43 @@ const LocationsTable: React.FC<{
         loadLocations();
     }, [organizationId]);
 
-
     return (
-        <div className="locations-table">
-            <div className="table-header">
-                <span>Location</span>
-                <span>Action</span>
-            </div>
-            {locations.map(loc => (
-                <div key={loc.id} className="table-row">
-                    <span>{loc.location.name}</span>
-                    <button
-                        onClick={() => onNavigateToDetails(loc.id)}
-                        className="view-button"
-                    >
-                        View
-                    </button>
+        <div className="manage-locations-screen">
+            <div className="locations-table">
+                <div className="table-header">
+                    <span>Location</span>
+                    <span>Action</span>
                 </div>
-            ))}
+                {locations.map(loc => (
+                    <div key={loc.id} className="table-row">
+                        <span>{loc.location.name}</span>
+                        <button
+                            onClick={() => onNavigateToDetails(loc.id)}
+                            className="view-button"
+                        >
+                            View
+                        </button>
+                    </div>
+                ))}
+            </div>
         </div>
     );
+
 };
 
-const LocationDetailsScreen: React.FC<{
+
+
+interface LocationDetailsScreenProps {
     locationId: string;
+    organizationId: string;
     onBack: () => void;
-}> = ({ locationId, onBack }) => {
-    const { organizationId } = useOrganization();
+}
+
+export const LocationDetailsScreen: React.FC<LocationDetailsScreenProps> = ({
+                                                                                locationId,
+                                                                                organizationId,
+                                                                                onBack
+                                                                            }) => {
     const [location, setLocation] = useState<LocationWithId | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [locationName, setLocationName] = useState('');
@@ -177,7 +195,7 @@ const LocationDetailsScreen: React.FC<{
     };
 
     return (
-        <div className="location-details">
+        <div className="manage-locations-screen">
             <div className="header">
                 <button onClick={onBack} className="back-button">
                     ← Back

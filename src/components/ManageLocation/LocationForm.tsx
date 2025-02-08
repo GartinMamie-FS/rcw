@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { useOrganization } from '../../context/OrganizationContext';
 import './LocationForm.css';
 
 interface LocationFormProps {
+    organizationId: string;
     onSaveComplete: () => void;
 }
 
-export const LocationForm: React.FC<LocationFormProps> = ({ onSaveComplete }) => {
-    const { organizationId } = useOrganization();
+export const LocationForm: React.FC<LocationFormProps> = ({ onSaveComplete, organizationId }) => {
     const [locationName, setLocationName] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +24,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({ onSaveComplete }) =>
     };
 
     return (
-        <div className="location-form">
+        <div className="location-form-component">
             <h2>Create New Location</h2>
 
             <form onSubmit={handleSubmit}>

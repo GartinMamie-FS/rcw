@@ -28,7 +28,6 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
     const [locations, setLocations] = useState<LocationWithParticipantCount[]>([]);
     const [programParticipants, setProgramParticipants] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
-    const [canSaveReport] = useState(isWithinEndOfMonthRange());
     const currentMonth = new Date().toLocaleString('default', {month: 'long'});
 
     useEffect(() => {
@@ -219,7 +218,7 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
                 <button
                     className="save-report-button"
                     onClick={saveProgramReport}
-                    disabled={!canSaveReport || isSaving}
+                    disabled={isSaving}
                 >
                     {isSaving ? 'Saving...' : 'Save Program Specific Report'}
                 </button>
@@ -265,12 +264,6 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
     );
 };
 
-    function isWithinEndOfMonthRange(): boolean {
-    const today = new Date();
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    const currentDay = today.getDate();
-    return currentDay >= lastDay - 3 || currentDay <= 3;
-}
 
 function isDateInSelectedMonth(dateStr: string | undefined, selectedMonth: string): boolean {
     if (!dateStr) return false;

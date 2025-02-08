@@ -221,8 +221,17 @@ export const AddNotes: React.FC<AddNotesProps> = ({ participantId, onSaveComplet
                                     disabled={!organizationId}
                                 />
                             </div>
+
+                            <button
+                                onClick={() => setCurrentSection('Peer Services')}
+                                className="continue-button"
+                                disabled={!organizationId}
+                            >
+                                Continue
+                            </button>
                         </div>
                     )}
+
 
                     {currentSection === 'Peer Services' && (
                         <div className="section">
@@ -270,13 +279,14 @@ export const AddNotes: React.FC<AddNotesProps> = ({ participantId, onSaveComplet
                             </div>
                             <button
                                 onClick={handleSaveAll}
-                                className="save-button"
+                                className="continue-button"
                                 disabled={!organizationId}
                             >
                                 Save All
                             </button>
                         </div>
                     )}
+
                 </div>
             </div>
         </div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, doc, getDoc, updateDoc, deleteDoc, collection, getDocs} from 'firebase/firestore';
-import { useOrganization } from '../../context/OrganizationContext';
 import './ProgramDetailsScreen.css';
 
 interface ProgramDetailsProps {
@@ -14,8 +13,17 @@ interface Program {
     organizationId: string;
 }
 
-export const ProgramDetailsScreen: React.FC<ProgramDetailsProps> = ({ programId, onBack }) => {
-    const { organizationId } = useOrganization();
+interface ProgramDetailsProps {
+    programId: string;
+    organizationId: string;
+    onBack: () => void;
+}
+
+export const ProgramDetailsScreen: React.FC<ProgramDetailsProps> = ({
+                                                                        programId,
+                                                                        organizationId,
+                                                                        onBack
+                                                                    }) => {
     const [program, setProgram] = useState<Program | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [programName, setProgramName] = useState('');
@@ -87,7 +95,7 @@ export const ProgramDetailsScreen: React.FC<ProgramDetailsProps> = ({ programId,
     };
 
     return (
-        <div className="program-details">
+        <div className="program-details-screen">
             <div className="header">
                 <button onClick={onBack} className="back-button">
                     ← Back

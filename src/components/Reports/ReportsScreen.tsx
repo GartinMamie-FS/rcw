@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useOrganization } from '../../context/OrganizationContext';
 import { getFirestore, collection, getDocs, query} from 'firebase/firestore';
 import { getStorage, ref, listAll, getDownloadURL, getMetadata } from 'firebase/storage';
 import { ReportType } from './types';
@@ -53,8 +52,11 @@ function renderReportContent(
 }
 
 
-export const ReportsScreen: React.FC = () => {
-    const { organizationId } = useOrganization();
+interface ReportsScreenProps {
+    organizationId: string;
+}
+
+export const ReportsScreen: React.FC<ReportsScreenProps> = ({ organizationId }) => {
     const [showHistorical, setShowHistorical] = useState(false);
     const [selectedReportType, setSelectedReportType] = useState<ReportType | null>(null);
     const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
@@ -192,13 +194,13 @@ export const ReportsScreen: React.FC = () => {
                 </button>
             </div>
 
-            <hr />
+            <hr/>
 
             <h3>Select Report Type</h3>
 
             <div className="report-type-buttons">
                 <ReportTypeButton
-                    text="Organization Recaps"
+                    text="Public Awareness/Impact Reports"
                     selected={selectedReportType === ReportType.RECAPS}
                     onClick={() => setSelectedReportType(ReportType.RECAPS)}
                 />
@@ -230,7 +232,7 @@ export const ReportsScreen: React.FC = () => {
                 </select>
             )}
 
-            <hr />
+            <hr/>
 
             {renderReportContent(selectedReportType, selectedProgram)}
         </div>

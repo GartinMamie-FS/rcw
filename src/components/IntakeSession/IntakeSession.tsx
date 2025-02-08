@@ -7,6 +7,7 @@ import { ParticipantAssignmentsForm } from './ParticipantAssignmentsForm';
 import './IntakeSession.css';
 
 interface IntakeSessionProps {
+    organizationId: string;
     onClose: () => void;
     onComplete: () => void;
     onNavigateToPeerProfile: (id: string) => void;
@@ -40,7 +41,7 @@ export const IntakeSession: React.FC<IntakeSessionProps> = ({ onClose, onComplet
     };
 
     return (
-        <div className="intake-session">
+        <div className="intake-session-component">
             <div className="header">
                 <h2>Intake Session</h2>
                 <button className="close-button" onClick={onClose}>×</button>

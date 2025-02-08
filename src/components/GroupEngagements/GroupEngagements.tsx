@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import './GroupEngagements.css';
 import { ServiceSelectionContent } from './ServiceSelectionContent';
 import { ParticipantSelectionContent } from './ParticipantSelectionContent';
-import { useOrganization } from '../../context/OrganizationContext';
 
 enum EngagementStep {
     NONE = 'NONE',
@@ -18,11 +17,15 @@ interface ParticipantWithSelection {
     lastName: string;
     isSelected: boolean;
 }
-
-export const GroupEngagementsScreen: React.FC<{
+interface GroupEngagementsScreenProps {
+    organizationId: string;
     onNavigateToParticipants: () => void;
-}> = ({ onNavigateToParticipants }) => {
-    const { organizationId } = useOrganization();
+}
+
+export const GroupEngagementsScreen: React.FC<GroupEngagementsScreenProps> = ({
+                                                                                  organizationId,
+                                                                                  onNavigateToParticipants
+                                                                              }) => {
     const [currentStep, setCurrentStep] = useState<EngagementStep>(EngagementStep.NONE);
     const [selectedService, setSelectedService] = useState<string | null>(null);
     const [selectedParticipants, setSelectedParticipants] = useState<ParticipantWithSelection[]>([]);
@@ -107,7 +110,7 @@ export const GroupEngagementsScreen: React.FC<{
 
 
     return (
-        <div className="group-engagements">
+        <div className="group-engagements-screen">
             <h2>Group Engagements</h2>
 
             <div className="content-grid">

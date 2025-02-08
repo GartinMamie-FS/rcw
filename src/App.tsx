@@ -9,6 +9,8 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { OrganizationProvider } from './context/OrganizationContext'
 import './App.css'
+import { useOrganization } from './context/OrganizationContext';
+
 
 interface UserData {
     firstName: string;
@@ -19,8 +21,13 @@ interface UserData {
 
 const ParticipantProfileWrapper = () => {
     const { id } = useParams();
-    return <ParticipantProfile participantId={id || ''} />;
+    const { organizationId } = useOrganization();
+    return <ParticipantProfile
+        participantId={id || ''}
+        organizationId={organizationId}
+    />;
 };
+
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -35,12 +42,17 @@ function App() {
             setIsLoggedIn(!!currentUser)
 
             if (currentUser) {
-                const userDoc = doc(db, 'users', currentUser.uid)
-                const userSnapshot = await getDoc(userDoc)
-                if (userSnapshot.exists()) {
-                    const userData = userSnapshot.data() as UserData
-                    setUserName(`${userData.firstName} ${userData.lastName}`)
-                    setUserRole(userData.role)
+                if (currentUser.email === 'mamiegartin@gmail.com') {
+                    setUserRole('developer');
+                    setUserName('Developer');
+                } else {
+                    const userDoc = doc(db, 'users', currentUser.uid)
+                    const userSnapshot = await getDoc(userDoc)
+                    if (userSnapshot.exists()) {
+                        const userData = userSnapshot.data() as UserData
+                        setUserName(`${userData.firstName} ${userData.lastName}`)
+                        setUserRole(userData.role)
+                    }
                 }
             }
         })
@@ -51,7 +63,10 @@ function App() {
     return (
         <div className="App">
             {!isLoggedIn ? (
-                <Auth />
+                <Auth onSignIn={(role) => {
+                    setUserRole(role);
+                    setIsLoggedIn(true);
+                }} />
             ) : (
                 <OrganizationProvider>
                     <Routes>

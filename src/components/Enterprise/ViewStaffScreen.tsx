@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, query, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { useOrganization } from '../../context/OrganizationContext';
 import './ViewStaffScreen.css';
 import { EditStaffScreen } from './EditStaffScreen';
 
@@ -11,10 +10,13 @@ interface StaffMember {
     organizationId: string;
 }
 
-export const ViewStaffScreen: React.FC = () => {
+interface ViewStaffScreenProps {
+    organizationId: string;
+}
+
+export const ViewStaffScreen: React.FC<ViewStaffScreenProps> = ({ organizationId }) => {
     const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
     const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
-    const { organizationId } = useOrganization();
     const db = getFirestore();
 
     useEffect(() => {
@@ -43,9 +45,9 @@ export const ViewStaffScreen: React.FC = () => {
     };
 
     return (
-        <div className="view-staff-screen">
+        <div className="view-staff-container">
             <h2>Staff Members</h2>
-            <table className="staff-table">
+            <table className="view-staff-members-table">
                 <thead>
                 <tr>
                     <th>Staff Member</th>
@@ -58,13 +60,13 @@ export const ViewStaffScreen: React.FC = () => {
                         <td>{staff.firstName} {staff.lastName}</td>
                         <td>
                             <button
-                                className="view-button"
+                                className="view-staff-action-button"
                                 onClick={() => setSelectedStaffId(staff.id)}
                             >
                                 View
                             </button>
                             <button
-                                className="delete-button"
+                                className="view-staff-delete-button"
                                 onClick={() => handleDelete(staff.id)}
                             >
                                 Delete

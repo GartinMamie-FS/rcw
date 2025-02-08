@@ -35,6 +35,7 @@ interface Note {
 }
 
 interface ParticipantProfileProps {
+    organizationId: string;
     participantId: string;
     onBackToParticipants?: () => void;
 }

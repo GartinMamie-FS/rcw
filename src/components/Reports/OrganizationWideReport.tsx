@@ -30,7 +30,7 @@ export const OrganizationWideReport: React.FC<OrganizationWideReportProps> = () 
         return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
     });
 
-    const canSaveReport = isWithinEndOfMonthRange();
+
 
     const getLastTwelveMonths = () => {
         const months = [];
@@ -258,9 +258,6 @@ export const OrganizationWideReport: React.FC<OrganizationWideReportProps> = () 
         }
     };
 
-
-
-
     return (
         <div className="organization-report">
             <div className="month-selector-container">
@@ -281,11 +278,9 @@ export const OrganizationWideReport: React.FC<OrganizationWideReportProps> = () 
                 <button
                     className="save-report-button"
                     onClick={saveEndOfMonthReport}
-                    disabled={!canSaveReport || isSaving}
+                    disabled={isSaving}
                 >
-                    {isSaving ? 'Saving...' : canSaveReport ?
-                        'Save End of Month Report' :
-                        'Report can only be saved within 3 days of month end'}
+                    {isSaving ? 'Saving...' : 'Save Report'}
                 </button>
                 <button
                     onClick={() => generatePDF()}
@@ -341,9 +336,3 @@ export const OrganizationWideReport: React.FC<OrganizationWideReportProps> = () 
     );
 };
 
-function isWithinEndOfMonthRange(): boolean {
-    const today = new Date();
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    const currentDay = today.getDate();
-    return currentDay >= lastDay - 3 || currentDay <= 3;
-}

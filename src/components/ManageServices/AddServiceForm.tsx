@@ -22,7 +22,7 @@ export const AddServiceForm: React.FC<AddServiceFormProps> = ({ onSaveComplete }
     };
 
     return (
-        <div className="service-form">
+        <div className="service-form-screen">
             <h2>Create New Service</h2>
 
             <form onSubmit={handleSubmit}>

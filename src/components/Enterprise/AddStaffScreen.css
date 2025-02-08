@@ -1,9 +1,9 @@
-.add-staff-screen {
+.add-staff-container {
     padding: 24px;
     height: 100%;
 }
 
-.staff-form {
+.add-staff-form-wrapper {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -14,29 +14,29 @@
     margin-bottom: 24px;
 }
 
-.required-text {
+.add-staff-required-text {
     color: #666;
     font-size: 0.9rem;
 }
 
-.form-group {
+.add-staff-form-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.form-group label {
+.add-staff-form-group label {
     font-weight: 500;
 }
 
-.form-input {
+.add-staff-input {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
 }
 
-.save-button {
+.add-staff-submit-button {
     align-self: flex-end;
     padding: 10px 20px;
     background-color: #1976d2;
@@ -47,38 +47,7 @@
     margin-top: 20px;
 }
 
-.save-button:disabled {
+.add-staff-submit-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
-}
-
-.staff-list {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 24px;
-}
-
-.staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.staff-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-}
-
-.staff-card h3 {
-    margin: 0 0 8px 0;
-    color: #1976d2;
-}
-
-.created-date {
-    color: #666;
-    font-size: 0.9rem;
-    margin-top: 8px;
 }

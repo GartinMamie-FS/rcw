@@ -4,11 +4,13 @@ import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firesto
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from '../../config/firebase';
 import './AddStaffScreen.css';
-import { useOrganization } from '../../context/OrganizationContext';
 
-export const AddStaffScreen: React.FC = () => {
+interface AddStaffScreenProps {
+    organizationId: string;
+}
+
+export const AddStaffScreen: React.FC<AddStaffScreenProps> = ({ organizationId }) => {
     const db = getFirestore();
-    const { organizationId } = useOrganization();
     const [staffEmail, setStaffEmail] = useState('');
     const [staffPassword, setStaffPassword] = useState('');
     const [staffRole, setStaffRole] = useState('staff');
@@ -69,74 +71,74 @@ export const AddStaffScreen: React.FC = () => {
     };
 
     return (
-        <div className="add-staff-screen">
-            <div className="staff-form">
+        <div className="add-staff-container">
+            <div className="add-staff-form-wrapper">
                 <h2>Add Staff Member</h2>
-                <p className="required-text">* indicates required field</p>
+                <p className="add-staff-required-text">* indicates required field</p>
 
                 <form onSubmit={handleAddStaff}>
-                    <div className="form-group">
+                    <div className="add-staff-form-group">
                         <label>First Name *</label>
                         <input
                             type="text"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
-                            className="form-input"
+                            className="add-staff-input"
                             required
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="add-staff-form-group">
                         <label>Last Name *</label>
                         <input
                             type="text"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
-                            className="form-input"
+                            className="add-staff-input"
                             required
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="add-staff-form-group">
                         <label>Staff Email *</label>
                         <input
                             type="email"
                             value={staffEmail}
                             onChange={(e) => setStaffEmail(e.target.value)}
-                            className="form-input"
+                            className="add-staff-input"
                             required
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="add-staff-form-group">
                         <label>Staff Password *</label>
                         <input
                             type="password"
                             value={staffPassword}
                             onChange={(e) => setStaffPassword(e.target.value)}
-                            className="form-input"
+                            className="add-staff-input"
                             required
                             minLength={6}
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="add-staff-form-group">
                         <label>Your Password (Required to maintain session) *</label>
                         <input
                             type="password"
                             value={currentAdminPassword}
                             onChange={(e) => setCurrentAdminPassword(e.target.value)}
-                            className="form-input"
+                            className="add-staff-input"
                             required
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="add-staff-form-group">
                         <label>Role *</label>
                         <select
                             value={staffRole}
                             onChange={(e) => setStaffRole(e.target.value)}
-                            className="form-input"
+                            className="add-staff-input"
                             required
                         >
                             <option value="staff">Staff</option>
@@ -146,7 +148,7 @@ export const AddStaffScreen: React.FC = () => {
 
                     <button
                         type="submit"
-                        className="save-button"
+                        className="add-staff-submit-button"
                         disabled={!staffEmail || !staffPassword || !firstName || !lastName || !currentAdminPassword}
                     >
                         Add Staff Member

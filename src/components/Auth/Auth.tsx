@@ -4,7 +4,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import './Auth.css';
 
 interface AuthProps {
-    onSignIn?: () => void;
+    onSignIn?: (role: 'developer' | 'admin' | 'staff') => void;
 }
 
 export const Auth: React.FC<AuthProps> = ({ onSignIn }) => {
@@ -26,10 +26,12 @@ export const Auth: React.FC<AuthProps> = ({ onSignIn }) => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             if (userCredential.user) {
-                onSignIn?.();
+                // Add role determination here
+                const userRole = email === 'mamiegartin@gmail.com' ? 'developer' : 'staff';
+                console.log('Determined user role:', userRole);
+                onSignIn?.(userRole); // Update the onSignIn prop to accept the role
             }
         } catch (err: any) {
-            // Handle specific Firebase auth errors
             const errorMessage = err.code === 'auth/invalid-credential'
                 ? 'Invalid email or password.'
                 : 'An error occurred during sign in. Please try again.';
@@ -38,6 +40,7 @@ export const Auth: React.FC<AuthProps> = ({ onSignIn }) => {
             setIsLoading(false);
         }
     };
+
 
     return (
         <form className="auth-container" onSubmit={signIn}>

@@ -15,7 +15,7 @@ import { ReportsScreen } from "../Reports/ReportsScreen";
 import { OrganizationManagementScreen } from '../Enterprise/OrganizationManagementScreen';
 import { useOrganization } from '../../context/OrganizationContext';
 import { AdminOrganizationManagement } from '../Enterprise/AdminOrganizationManagement';
-import { CreateOrganizationRecapScreen } from '../CreateOrganizationRecap/CreateOrganizationRecap';
+import {CreateOrganizationRecapScreen} from "../CreateOrganizationRecap/CreateOrganizationRecap.tsx";
 
 interface DashboardProps {
     userEmail: string;
@@ -24,25 +24,28 @@ interface DashboardProps {
     onLogout: () => Promise<void>;
 }
 
+
+
 export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLogout }) => {
     const {organizationId, setOrganizationId} = useOrganization();
     const [userName, setUserName] = useState('');
     const [currentScreen, setCurrentScreen] = useState('Participants');
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const [isOrgMenuExpanded, setIsOrgMenuExpanded] = useState(false);
-    const [isEnterpriseMenuExpanded, setIsEnterpriseMenuExpanded] = useState(false);
     const [showAccount, setShowAccount] = useState(false);
     const [showIntakeSession, setShowIntakeSession] = useState(false);
     const [selectedParticipantId, setSelectedParticipantId] = useState<string | null>(null);
     const [actualUserRole, setActualUserRole] = useState<'developer' | 'admin' | 'staff'>('staff');
 
-    const enterpriseItems = [
-        'Organization',
-        'Add Staff'
-    ];
+    // Add the new useEffect here
+    useEffect(() => {
+        console.log('Current Screen:', currentScreen);
+        console.log('User Role:', actualUserRole);
+    }, [currentScreen, actualUserRole]);
+
 
     const organizationItems = [
-        'Manage Organization Recaps',
+        'Manage Public Awareness/Impact Reports',
         'Manage Program ID',
         'Manage Services',
         'Manage Locations',
@@ -77,7 +80,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
 
     useEffect(() => {
         const fetchUserOrganization = async () => {
-            if (userRole !== 'developer' && auth.currentUser) {
+            console.log('Incoming userRole prop:', userRole);
+            console.log('Current auth user:', auth.currentUser?.email);
+
+            if (auth.currentUser) {
+                if (userRole === 'developer') {
+                    console.log('Setting developer role');
+                    setActualUserRole('developer');
+                    return;
+                }
+
                 const db = getFirestore();
                 const orgsRef = collection(db, 'organizations');
                 const orgsSnapshot = await getDocs(orgsRef);
@@ -88,6 +100,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
 
                     if (userSnap.exists()) {
                         setOrganizationId(orgDoc.id);
+                        const userData = userSnap.data();
+                        setActualUserRole(userData.role);
+                        console.log('Found user in organization:', userData.role);
                         break;
                     }
                 }
@@ -96,6 +111,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
 
         fetchUserOrganization();
     }, [userRole, setOrganizationId]);
+
+
 
     useEffect(() => {
         const fetchActualUserRole = async () => {
@@ -117,6 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
         if (showIntakeSession) {
             return (
                 <IntakeSession
+                    organizationId={organizationId}
                     onClose={() => setShowIntakeSession(false)}
                     onComplete={() => {
                         setShowIntakeSession(false);
@@ -131,68 +149,82 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
 
         switch (currentScreen) {
             case 'Organization':
-                return actualUserRole === 'developer' ? <OrganizationManagementScreen/> :
-                    <AdminOrganizationManagement/>;
+                console.log('Current Screen: Organization');
+                console.log('Actual User Role:', actualUserRole);
+                if (actualUserRole === 'developer') {
+                    console.log('Rendering OrganizationManagementScreen');
+                    return <OrganizationManagementScreen />;
+                } else {
+                    console.log('Rendering AdminOrganizationManagement');
+                    return <AdminOrganizationManagement organizationId={organizationId}/>;
+                }
             case 'OrganizationEngagements':
-                return actualUserRole === 'admin' ? <AdminOrganizationManagement/> : <OrganizationManagementScreen/>;
+                return actualUserRole === 'admin' ?
+                    <AdminOrganizationManagement organizationId={organizationId}/> :
+                    <OrganizationManagementScreen />;
             case 'CreateOrganizationRecap':
-                return <CreateOrganizationRecapScreen onBack={() => setCurrentScreen('GroupEngagements')}/>;
+                return <CreateOrganizationRecapScreen
+                   organizationId={organizationId}
+                   onBack={() => setCurrentScreen('GroupEngagements')}
+                />;
             case 'Participants':
                 return selectedParticipantId ? (
                     <ParticipantProfile
+                        organizationId={organizationId}
                         participantId={selectedParticipantId}
                         onBackToParticipants={() => setSelectedParticipantId(null)}
                     />
                 ) : (
                     <Participants
+                        organizationId={organizationId}
                         onNewIntake={() => setShowIntakeSession(true)}
                         onViewParticipant={(id) => setSelectedParticipantId(id)}
-                        organizationId={organizationId}
                     />
                 );
             case 'GroupEngagements':
-                return <GroupEngagementsScreen onNavigateToParticipants={() => setCurrentScreen('Participants')}/>;
+                return <GroupEngagementsScreen
+                    organizationId={organizationId}
+                    onNavigateToParticipants={() => setCurrentScreen('Participants')}
+                />;
             case 'Reports':
-                return <ReportsScreen/>;
+                return <ReportsScreen organizationId={organizationId}/>;
             case 'Manage Locations':
-                return <ManageLocationsScreen/>;
+                return <ManageLocationsScreen organizationId={organizationId}/>;
             case 'Manage Program ID':
-                return <ManageProgramsScreen/>;
+                return <ManageProgramsScreen organizationId={organizationId}/>;
             case 'Manage Services':
-                return <ManageServicesScreen/>;
-            case 'Manage Organization Recaps':
-                return <ManageOrganizationRecapsScreen/>;
+                return <ManageServicesScreen organizationId={organizationId}/>;
+            case 'Manage Public Awareness/Impact Reports':
+                return <ManageOrganizationRecapsScreen organizationId={organizationId}/>;
             default:
                 return <Participants
+                    organizationId={organizationId}
                     onNewIntake={() => setShowIntakeSession(true)}
                     onViewParticipant={(id) => setSelectedParticipantId(id)}
-                    organizationId={organizationId}
                 />;
         }
     };
 
-
-
     return (
         <div className="dashboard">
-            <header className="top-bar">
+            <header className="dashboard-top-bar">
                 <h1>Recovery Connect</h1>
-                <div className="profile-section">
+                <div className="dashboard-profile-section">
                     <div
-                        className="profile-trigger"
+                        className="dashboard-profile-trigger"
                         onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                     >
-                        <div className="profile-image"></div>
+                        <div className="dashboard-profile-image"></div>
                         <span>{userName}</span>
                     </div>
                     {isProfileMenuOpen && (
-                        <div className="profile-menu">
+                        <div className="dashboard-profile-menu">
                             <button onClick={() => setShowAccount(true)}>Account</button>
                             <button onClick={onLogout}>Log Out</button>
                         </div>
                     )}
                     {showAccount && (
-                        <div className="modal-overlay">
+                        <div className="dashboard-modal-overlay">
                             <Account
                                 userEmail={userEmail}
                                 userId={auth.currentUser?.uid || ''}
@@ -203,11 +235,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                 </div>
             </header>
 
-            <div className="main-content">
-                <nav className="side-nav">
+            <div className="dashboard-main-content">
+                <nav className="dashboard-side-nav">
                     {(actualUserRole === 'admin' || actualUserRole === 'developer') && (
                         <button
-                            className="nav-link"
+                            className="dashboard-nav-link"
                             onClick={() => {
                                 setCurrentScreen('OrganizationEngagements');
                                 setShowIntakeSession(false);
@@ -217,45 +249,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                         </button>
                     )}
 
-                    {actualUserRole === 'developer' && (
-                        <div className="nav-section">
-                            <div
-                                className="nav-header"
-                                onClick={() => setIsEnterpriseMenuExpanded(!isEnterpriseMenuExpanded)}
-                            >
-                                <span>Enterprise</span>
-                                <span className={`arrow ${isEnterpriseMenuExpanded ? 'down' : 'right'}`}>▶</span>
-                            </div>
-                            {isEnterpriseMenuExpanded && (
-                                <div className="nav-items">
-                                    {enterpriseItems.map(item => (
-                                        <button
-                                            key={item}
-                                            onClick={() => {
-                                                setCurrentScreen(item);
-                                                setShowIntakeSession(false);
-                                            }}
-                                            className="nav-item"
-                                        >
-                                            {item}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
 
                     {(actualUserRole === 'admin' || actualUserRole === 'developer') && (
-                        <div className="nav-section">
+                        <div className="dashboard-nav-section">
                             <div
-                                className="nav-header"
+                                className="dashboard-nav-header"
                                 onClick={() => setIsOrgMenuExpanded(!isOrgMenuExpanded)}
                             >
                                 <span>Organization</span>
-                                <span className={`arrow ${isOrgMenuExpanded ? 'down' : 'right'}`}>▶</span>
+                                <span className={`dashboard-arrow ${isOrgMenuExpanded ? 'down' : 'right'}`}>▶</span>
                             </div>
                             {isOrgMenuExpanded && (
-                                <div className="nav-items">
+                                <div className="dashboard-nav-items">
                                     {organizationItems.map(item => (
                                         <button
                                             key={item}
@@ -263,7 +268,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                                                 setCurrentScreen(item);
                                                 setShowIntakeSession(false);
                                             }}
-                                            className="nav-item"
+                                            className="dashboard-nav-item"
                                         >
                                             {item}
                                         </button>
@@ -274,7 +279,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                     )}
 
                     <button
-                        className="nav-link"
+                        className="dashboard-nav-link"
                         onClick={() => {
                             setCurrentScreen('Reports');
                             setShowIntakeSession(false);
@@ -283,7 +288,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                         Reports
                     </button>
                     <button
-                        className="nav-link"
+                        className="dashboard-nav-link"
                         onClick={() => {
                             setCurrentScreen('GroupEngagements');
                             setShowIntakeSession(false);
@@ -292,16 +297,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                         Group Engagements
                     </button>
                     <button
-                        className="nav-link"
+                        className="dashboard-nav-link"
                         onClick={() => {
                             setCurrentScreen('CreateOrganizationRecap');
                             setShowIntakeSession(false);
                         }}
                     >
-                        Create Organization Recap
+                        Create Public Awareness/Impact Report
                     </button>
                     <button
-                        className="nav-link"
+                        className="dashboard-nav-link"
                         onClick={() => {
                             setCurrentScreen('Participants');
                             setShowIntakeSession(false);
@@ -312,7 +317,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                     </button>
                 </nav>
 
-                <main className="content-area">
+                <main className="dashboard-content-area">
                     {renderContent()}
                 </main>
             </div>

@@ -27,11 +27,11 @@ export const RecapTypeCard: React.FC<RecapTypeCardProps> = ({ recapType, onUpdat
     return (
         <div className="recap-type-card">
             <div className="card-header">
-                <h3>{recapType.name}</h3>
-                <div className="card-actions">
-                    <button onClick={() => setIsEditing(true)}>Edit</button>
-                    <button onClick={onDelete} className="delete-button">Delete</button>
-                </div>
+                <h3 style={{ width: '100%', textAlign: 'center' }}>{recapType.name}</h3>
+            </div>
+            <div className="card-actions" style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
+                <button onClick={() => setIsEditing(true)}>Edit</button>
+                <button onClick={onDelete} className="delete-button">Delete</button>
             </div>
             <div className="fields-list">
                 {recapType.fields.map((field) => (

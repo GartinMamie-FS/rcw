@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { useOrganization } from '../../context/OrganizationContext';
 import { ServiceDetailsScreen } from './ServiceDetailsScreen';
 import { AddServiceForm } from './AddServiceForm';
 import { ServicesTable } from './ServicesTable';
 import './ManageServices.css';
 
-export const ManageServicesScreen: React.FC = () => {
-    const { organizationId } = useOrganization();
+interface ManageServicesScreenProps {
+    organizationId: string;
+}
+export const ManageServicesScreen: React.FC<ManageServicesScreenProps> = ({organizationId}) => {
+
     const [showServiceForm, setShowServiceForm] = useState(false);
     const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
@@ -29,7 +31,7 @@ export const ManageServicesScreen: React.FC = () => {
         }
 
         return (
-            <div className="services-container">
+            <div className="manage-services-screen">
                 <div className="header-container">
                     <h2>Manage Services</h2>
                     <button
@@ -47,5 +49,5 @@ export const ManageServicesScreen: React.FC = () => {
         );
     };
 
-    return renderContent();
+        return renderContent();
 };

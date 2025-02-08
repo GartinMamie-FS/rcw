@@ -1,10 +1,10 @@
-.admin-org-management {
+.org-management-container {
     display: flex;
     height: 100%;
     gap: 24px;
 }
 
-.navigation-panel {
+.org-management-nav-panel {
     width: 250px;
     background: white;
     padding: 20px;
@@ -12,13 +12,13 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.nav-links {
+.org-management-nav-links {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.nav-link {
+.org-management-nav-button {
     text-align: left;
     padding: 12px;
     border: none;
@@ -28,16 +28,16 @@
     transition: background-color 0.2s;
 }
 
-.nav-link:hover {
+.org-management-nav-button:hover {
     background-color: #f5f5f5;
 }
 
-.nav-link.active {
+.org-management-nav-button.active {
     color: #1976d2;
     background-color: #e3f2fd;
 }
 
-.content-panel {
+.org-management-content {
     flex: 1;
     background: white;
     border-radius: 8px;

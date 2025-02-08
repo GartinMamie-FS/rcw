@@ -46,52 +46,52 @@ export const Account: React.FC<AccountProps> = ({ userEmail, userId, onClose }) 
     };
 
     return (
-        <div className="account-container">
+        <div className="user-account-container">
             <h2>Edit Profile</h2>
-            <form onSubmit={handleSubmit} className="account-form">
-                <div className="form-group">
+            <form onSubmit={handleSubmit} className="user-account-form">
+                <div className="user-account-form-group">
                     <label>First Name</label>
                     <input
                         type="text"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        className="form-input"
+                        className="user-account-input"
                     />
                 </div>
 
-                <div className="form-group">
+                <div className="user-account-form-group">
                     <label>Last Name</label>
                     <input
                         type="text"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        className="form-input"
+                        className="user-account-input"
                     />
                 </div>
 
-                <div className="form-group">
+                <div className="user-account-form-group">
                     <label>Email Address</label>
                     <input
                         type="email"
                         value={userEmail}
                         disabled
-                        className="form-input disabled"
+                        className="user-account-input user-account-input-disabled"
                     />
                 </div>
 
-                {message && <div className="message">{message}</div>}
+                {message && <div className="user-account-message">{message}</div>}
 
-                <div className="button-group">
+                <div className="user-account-button-group">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="button secondary"
+                        className="user-account-button user-account-button-secondary"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="button primary"
+                        className="user-account-button user-account-button-primary"
                         disabled={isLoading}
                     >
                         {isLoading ? 'Saving...' : 'Save Changes'}

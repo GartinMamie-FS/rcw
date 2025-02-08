@@ -43,7 +43,7 @@ export const ServiceDetailsScreen: React.FC<ServiceDetailsProps> = ({ serviceId,
     };
 
     return (
-        <div className="service-details">
+        <div className="service-details-screen">
             <div className="header">
                 <button onClick={onBack} className="back-button">
                     ← Back

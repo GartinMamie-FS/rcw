@@ -1,59 +1,50 @@
-.location-form {
+.manage-locations-screen {
     padding: 24px;
 }
 
-.location-form h2 {
-    text-align: center;
-    margin-bottom: 32px;
-    color: #333;
-}
-
-.form-group {
+.manage-locations-screen .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 24px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-}
-
-.form-input {
+.manage-locations-screen .locations-table {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
 }
 
-.button-container {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
+.manage-locations-screen .table-header {
+    display: grid;
+    grid-template-columns: 1fr 100px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    font-weight: 500;
 }
 
-.form-button {
-    min-width: 120px;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
+.manage-locations-screen .table-row {
+    display: grid;
+    grid-template-columns: 1fr 100px;
+    padding: 12px;
+    align-items: center;
+    border-bottom: 1px solid #eee;
 }
 
-.form-button[type="submit"] {
+.manage-locations-screen .view-button {
+    padding: 4px 8px;
+    font-size: 0.85rem;
     background-color: #1976d2;
     color: white;
     border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: fit-content;
 }
 
-.form-button[type="submit"]:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.form-button[type="button"] {
-    background-color: #f5f5f5;
-    color: #333;
-    border: 1px solid #ddd;
+.manage-locations-screen .create-button {
+    padding: 8px 16px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }

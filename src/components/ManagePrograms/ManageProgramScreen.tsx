@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, addDoc, updateDoc} from 'firebase/firestore';
-import { useOrganization } from '../../context/OrganizationContext';
 import './ManagePrograms.css';
 import { ProgramDetailsScreen } from './ProgramDetailsScreen';
 
@@ -15,21 +14,28 @@ interface ProgramWithId {
     date: string;
 }
 
-export const ManageProgramsScreen: React.FC = () => {
-    //const { organizationId } = useOrganization();
+interface ManageProgramsScreenProps {
+    organizationId: string;
+}
+
+export const ManageProgramsScreen: React.FC<ManageProgramsScreenProps> = ({ organizationId }) => {
     const [showProgramForm, setShowProgramForm] = useState(false);
     const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
 
     const renderContent = () => {
         if (showProgramForm) {
             return (
-                <CreateProgramForm onSaveComplete={() => setShowProgramForm(false)} />
+                <CreateProgramForm
+                    organizationId={organizationId}
+                    onSaveComplete={() => setShowProgramForm(false)}
+                />
             );
         }
 
         if (selectedProgramId) {
             return (
                 <ProgramDetailsScreen
+                    organizationId={organizationId}
                     programId={selectedProgramId}
                     onBack={() => setSelectedProgramId(null)}
                 />
@@ -37,7 +43,7 @@ export const ManageProgramsScreen: React.FC = () => {
         }
 
         return (
-            <div className="programs-container">
+            <div className="manage-programs-screen">
                 <div className="header-container">
                     <h2>Manage Programs</h2>
                     <button
@@ -48,6 +54,7 @@ export const ManageProgramsScreen: React.FC = () => {
                     </button>
                 </div>
                 <ProgramsTable
+                    organizationId={organizationId}
                     onNavigateToDetails={(programId) => setSelectedProgramId(programId)}
                 />
             </div>
@@ -57,10 +64,15 @@ export const ManageProgramsScreen: React.FC = () => {
     return renderContent();
 };
 
-const ProgramsTable: React.FC<{
+
+interface ProgramsTableProps {
+    organizationId: string;
     onNavigateToDetails: (programId: string) => void;
-}> = ({ onNavigateToDetails }) => {
-    const { organizationId } = useOrganization();
+}
+
+// The main component structure stays the same, just update the ProgramsTable component:
+
+const ProgramsTable: React.FC<ProgramsTableProps> = ({ organizationId, onNavigateToDetails }) => {
     const [programs, setPrograms] = useState<ProgramWithId[]>([]);
 
     useEffect(() => {
@@ -85,32 +97,36 @@ const ProgramsTable: React.FC<{
     }, [organizationId]);
 
     return (
-        <div className="programs-table">
-            <div className="table-header">
-                <span>Program</span>
-                <span>Date Created</span>
-                <span>Action</span>
-            </div>
-            {programs.map(prog => (
-                <div key={prog.id} className="table-row">
-                    <span>{prog.program.name}</span>
-                    <span>{prog.date}</span>
-                    <button
-                        onClick={() => onNavigateToDetails(prog.id)}
-                        className="view-button"
-                    >
-                        View
-                    </button>
+        <div className="manage-programs-screen">
+            <div className="programs-table">
+                <div className="table-header">
+                    <span>Program</span>
+                    <span>Action</span>
                 </div>
-            ))}
+                {programs.map(prog => (
+                    <div key={prog.id} className="table-row">
+                        <span>{prog.program.name}</span>
+                        <button
+                            onClick={() => onNavigateToDetails(prog.id)}
+                            className="view-button"
+                        >
+                            View
+                        </button>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
 
-const CreateProgramForm: React.FC<{
+
+
+interface CreateProgramFormProps {
+    organizationId: string;
     onSaveComplete: () => void;
-}> = ({ onSaveComplete }) => {
-    const { organizationId } = useOrganization();
+}
+
+const CreateProgramForm: React.FC<CreateProgramFormProps> = ({ organizationId, onSaveComplete }) => {
     const [programName, setProgramName] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -157,7 +173,7 @@ const CreateProgramForm: React.FC<{
     };
 
     return (
-        <div className="create-program-form">
+        <div className="manage-programs-screen">
             <h2>Create New Program</h2>
 
             <form onSubmit={handleSubmit}>

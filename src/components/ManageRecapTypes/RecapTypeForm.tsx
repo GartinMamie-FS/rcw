@@ -23,7 +23,7 @@ export const RecapTypeForm: React.FC<RecapTypeFormProps> = ({ initialData, onSav
     return (
         <div className="recap-type-form">
             <div className="form-group">
-                <label>Recap Type Name</label>
+                <label>Public Awareness/Impact Name</label>
                 <input
                     type="text"
                     value={name}
@@ -32,7 +32,7 @@ export const RecapTypeForm: React.FC<RecapTypeFormProps> = ({ initialData, onSav
             </div>
 
             <div className="fields-section">
-                <h3>Fields</h3>
+                <h3>Report Fields</h3>
                 {fields.map((field, index) => (
                     <div key={field.id} className="field-item">
                         <input

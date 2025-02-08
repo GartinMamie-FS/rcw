@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { useOrganization } from '../../context/OrganizationContext';
 import { RecapType, RecapField } from './types';
 import { RecapTypeCard } from './RecapTypeCard';
 import './ManageRecapTypes.css';
 
-export const ManageRecapTypes: React.FC = () => {
-    const { organizationId } = useOrganization();
+interface ManageRecapTypesProps {
+    organizationId: string;
+}
+
+export const ManageRecapTypes: React.FC<ManageRecapTypesProps> = ({ organizationId }) => {
     const [recapTypes, setRecapTypes] = useState<RecapType[]>([]);
     const [isAddingNew, setIsAddingNew] = useState(false);
 
@@ -28,8 +30,7 @@ export const ManageRecapTypes: React.FC = () => {
     return (
         <div className="manage-recap-types">
             <div className="header">
-                <h2>Manage Recap Types</h2>
-                <button onClick={() => setIsAddingNew(true)}>Add New Recap Type</button>
+                <button onClick={() => setIsAddingNew(true)}>Add New Report Type</button>
             </div>
 
             {isAddingNew && (
@@ -66,6 +67,7 @@ export const ManageRecapTypes: React.FC = () => {
     );
 };
 
+
 const RecapTypeForm: React.FC<{
     initialData?: RecapType;
     onSave: (data: Omit<RecapType, 'id'>) => void;
@@ -86,7 +88,7 @@ const RecapTypeForm: React.FC<{
     return (
         <div className="recap-type-form">
             <div className="form-group">
-                <label>Recap Type Name</label>
+                <label>Public Awareness/Impact Name</label>
                 <input
                     type="text"
                     value={name}
@@ -95,7 +97,26 @@ const RecapTypeForm: React.FC<{
             </div>
 
             <div className="fields-section">
-                <h3>Fields</h3>
+                <h3>Report Fields</h3>
+                <h4 className="examples-header">Examples</h4>
+                <div className="field-examples-container">
+                    <div className="field-example-column">
+                        <p className="example-title">Community Collaboration:</p>
+                        <ul>
+                            <li>Field 1: Date</li>
+                            <li>Field 2: Details</li>
+                            <li>Field 3: Number of Participants</li>
+                        </ul>
+                    </div>
+                    <div className="field-example-column">
+                        <p className="example-title">Narcan Distribution:</p>
+                        <ul>
+                            <li>Field 1: Date</li>
+                            <li>Field 2: Location</li>
+                            <li>Field 3: Number of Distributed</li>
+                        </ul>
+                    </div>
+                </div>
                 {fields.map((field, index) => (
                     <div key={field.id} className="field-item">
                         <input
@@ -135,14 +156,15 @@ const RecapTypeForm: React.FC<{
                         </label>
                         <button onClick={() => {
                             setFields(fields.filter((_, i) => i !== index));
-                        }}>Remove</button>
+                        }}>Remove
+                        </button>
                     </div>
                 ))}
                 <button onClick={addField}>Add Field</button>
             </div>
 
             <div className="button-container">
-                <button onClick={() => onSave({ name, fields })}>Save</button>
+                <button onClick={() => onSave({name, fields})}>Save</button>
                 <button onClick={onCancel}>Cancel</button>
             </div>
         </div>
