@@ -65,6 +65,21 @@ export const OrganizationManagementScreen: React.FC = () => {
         }
     };
 
+    const handleRenewSubscription = async (orgId: string) => {
+        try {
+            const endDate = new Date();
+            endDate.setFullYear(endDate.getFullYear() + 1); // Adds 1 year from current date
+
+            await setDoc(doc(db, 'organizations', orgId), {
+                subscriptionEndDate: Timestamp.fromDate(endDate)
+            }, { merge: true });
+
+            fetchOrganizations();
+        } catch (error) {
+            console.error('Error renewing subscription:', error);
+        }
+    };
+
     const handleAddOrganization = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -219,6 +234,12 @@ export const OrganizationManagementScreen: React.FC = () => {
                                 <p>Subscription Tier: {org.subscriptionTier}</p>
                                 <p>Users: {org.currentUsers}/{org.maxUsers}</p>
                                 <p>Subscription Ends: {org.subscriptionEndDate?.toDate().toLocaleDateString()}</p>
+                                <button
+                                    onClick={() => handleRenewSubscription(org.id)}
+                                    className="renew-button"
+                                >
+                                    Renew Subscription
+                                </button>
                                 <select
                                     onChange={(e) => handleUpdateSubscription(org.id, Number(e.target.value))}
                                     value={org.subscriptionTier}

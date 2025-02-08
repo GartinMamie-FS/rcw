@@ -3,6 +3,8 @@ import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } 
 import { RecapType, RecapField } from './types';
 import { RecapTypeCard } from './RecapTypeCard';
 import './ManageRecapTypes.css';
+import { useContext } from 'react';
+import { SubscriptionContext } from '../../context/SubscriptionContext';
 
 interface ManageRecapTypesProps {
     organizationId: string;
@@ -11,6 +13,7 @@ interface ManageRecapTypesProps {
 export const ManageRecapTypes: React.FC<ManageRecapTypesProps> = ({ organizationId }) => {
     const [recapTypes, setRecapTypes] = useState<RecapType[]>([]);
     const [isAddingNew, setIsAddingNew] = useState(false);
+    const { isExpired } = useContext(SubscriptionContext);
 
     useEffect(() => {
         loadRecapTypes();
@@ -30,7 +33,20 @@ export const ManageRecapTypes: React.FC<ManageRecapTypesProps> = ({ organization
     return (
         <div className="manage-recap-types">
             <div className="header">
-                <button onClick={() => setIsAddingNew(true)}>Add New Report Type</button>
+                <div className="add-button-container">
+                    <button
+                        onClick={() => setIsAddingNew(true)}
+                        className={`add-button ${isExpired ? 'disabled' : ''}`}
+                        disabled={isExpired}
+                    >
+                        Add New Report Type
+                    </button>
+                    {isExpired && (
+                        <div className="expired-message">
+                            Subscription renewal required to add new report types
+                        </div>
+                    )}
+                </div>
             </div>
 
             {isAddingNew && (

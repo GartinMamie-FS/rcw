@@ -7,6 +7,7 @@ interface ParticipantsProps {
     onNewIntake: () => void;
     onViewParticipant: (id: string) => void;
     organizationId?: string;
+    isExpired: boolean;
 }
 
 interface Participant {
@@ -18,8 +19,7 @@ interface Participant {
     currentProgram: string;
     organizationId: string;
 }
-
-export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewParticipant }) => {
+export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewParticipant, isExpired }) => {
     const {organizationId} = useOrganization();
     const [participants, setParticipants] = useState<Participant[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -94,12 +94,20 @@ export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewP
         <div className="participants-container">
             <div className="participants-header">
                 <h2>All Participants ({filteredParticipants.length})</h2>
-                <button
-                    className="new-intake-button"
-                    onClick={onNewIntake}
-                >
-                    New Intake Session
-                </button>
+                <div className="intake-section">
+                    <button
+                        className={`new-intake-button ${isExpired ? 'disabled' : ''}`}
+                        onClick={onNewIntake}
+                        disabled={isExpired}
+                    >
+                        New Intake Session
+                    </button>
+                    {isExpired && (
+                        <div className="expired-message">
+                            Subscription renewal required to add new participants
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="search-section">

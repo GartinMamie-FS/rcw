@@ -4,13 +4,18 @@ import { AddServiceForm } from './AddServiceForm';
 import { ServicesTable } from './ServicesTable';
 import './ManageServices.css';
 
+
+import { useContext } from 'react';
+import { SubscriptionContext } from '../../context/SubscriptionContext';
+
 interface ManageServicesScreenProps {
     organizationId: string;
 }
-export const ManageServicesScreen: React.FC<ManageServicesScreenProps> = ({organizationId}) => {
 
+export const ManageServicesScreen: React.FC<ManageServicesScreenProps> = ({organizationId}) => {
     const [showServiceForm, setShowServiceForm] = useState(false);
     const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+    const { isExpired } = useContext(SubscriptionContext);
 
     const renderContent = () => {
         if (showServiceForm) {
@@ -34,13 +39,20 @@ export const ManageServicesScreen: React.FC<ManageServicesScreenProps> = ({organ
             <div className="manage-services-screen">
                 <div className="header-container">
                     <h2>Manage Services</h2>
-                    <button
-                        className="create-button"
-                        onClick={() => setShowServiceForm(true)}
-                        disabled={!organizationId}
-                    >
-                        Add Service
-                    </button>
+                    <div className="create-button-container">
+                        <button
+                            className={`create-button ${isExpired ? 'disabled' : ''}`}
+                            onClick={() => setShowServiceForm(true)}
+                            disabled={!organizationId || isExpired}
+                        >
+                            Add Service
+                        </button>
+                        {isExpired && (
+                            <div className="expired-message">
+                                Subscription renewal required to add new services
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <ServicesTable
                     onNavigateToDetails={(serviceId) => setSelectedServiceId(serviceId)}
@@ -49,5 +61,5 @@ export const ManageServicesScreen: React.FC<ManageServicesScreenProps> = ({organ
         );
     };
 
-        return renderContent();
+    return renderContent();
 };

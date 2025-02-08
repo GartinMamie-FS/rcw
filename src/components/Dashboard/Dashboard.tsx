@@ -16,6 +16,8 @@ import { OrganizationManagementScreen } from '../Enterprise/OrganizationManageme
 import { useOrganization } from '../../context/OrganizationContext';
 import { AdminOrganizationManagement } from '../Enterprise/AdminOrganizationManagement';
 import {CreateOrganizationRecapScreen} from "../CreateOrganizationRecap/CreateOrganizationRecap.tsx";
+import { Timestamp } from 'firebase/firestore';
+import { SubscriptionContext } from '../../context/SubscriptionContext';
 
 interface DashboardProps {
     userEmail: string;
@@ -24,6 +26,10 @@ interface DashboardProps {
     onLogout: () => Promise<void>;
 }
 
+interface OrganizationData {
+    subscriptionEndDate: Timestamp;
+    // ... other organization fields
+}
 
 
 export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLogout }) => {
@@ -36,6 +42,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
     const [showIntakeSession, setShowIntakeSession] = useState(false);
     const [selectedParticipantId, setSelectedParticipantId] = useState<string | null>(null);
     const [actualUserRole, setActualUserRole] = useState<'developer' | 'admin' | 'staff'>('staff');
+    const [organizationData, setOrganizationData] = useState<OrganizationData | null>(null);
+    const [showRenewalBanner, setShowRenewalBanner] = useState(false);
+    const [isSubscriptionExpired, setIsSubscriptionExpired] = useState(false);
 
     // Add the new useEffect here
     useEffect(() => {
@@ -130,6 +139,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
         fetchActualUserRole();
     }, [organizationId]);
 
+    useEffect(() => {
+        const fetchOrganizationData = async () => {
+            if (organizationId) {
+                const db = getFirestore();
+                const orgDoc = await getDoc(doc(db, 'organizations', organizationId));
+                if (orgDoc.exists()) {
+                    const data = orgDoc.data() as OrganizationData;
+                    setOrganizationData(data);
+
+                    const today = new Date();
+                    const expirationDate = data.subscriptionEndDate.toDate();
+
+                    // Check if subscription is expired
+                    setIsSubscriptionExpired(today > expirationDate);
+
+                    // Check if within one month of expiration
+                    const oneMonthBeforeExpiration = new Date(expirationDate);
+                    oneMonthBeforeExpiration.setMonth(oneMonthBeforeExpiration.getMonth() - 1);
+
+                    if (today >= oneMonthBeforeExpiration) {
+                        setShowRenewalBanner(true);
+                    }
+                }
+            }
+        };
+
+        fetchOrganizationData();
+    }, [organizationId]);
+
+
     const renderContent = () => {
         if (showIntakeSession) {
             return (
@@ -179,6 +218,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                         organizationId={organizationId}
                         onNewIntake={() => setShowIntakeSession(true)}
                         onViewParticipant={(id) => setSelectedParticipantId(id)}
+                        isExpired={isSubscriptionExpired}
                     />
                 );
             case 'GroupEngagements':
@@ -201,126 +241,147 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                     organizationId={organizationId}
                     onNewIntake={() => setShowIntakeSession(true)}
                     onViewParticipant={(id) => setSelectedParticipantId(id)}
+                    isExpired={isSubscriptionExpired}
                 />;
         }
     };
 
     return (
-        <div className="dashboard">
-            <header className="dashboard-top-bar">
-                <h1>Recovery Connect</h1>
-                <div className="dashboard-profile-section">
-                    <div
-                        className="dashboard-profile-trigger"
-                        onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    >
-                        <div className="dashboard-profile-image"></div>
-                        <span>{userName}</span>
+        <SubscriptionContext.Provider value={{ isExpired: isSubscriptionExpired }}>
+            <div className="dashboard">
+                <header className="dashboard-top-bar">
+                    <h1>Recovery Connect</h1>
+                    <div className="dashboard-profile-section">
+                        <div
+                            className="dashboard-profile-trigger"
+                            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                        >
+                            <div className="dashboard-profile-image"></div>
+                            <span>{userName}</span>
+                        </div>
+                        {isProfileMenuOpen && (
+                            <div className="dashboard-profile-menu">
+                                <button onClick={() => setShowAccount(true)}>Account</button>
+                                <button onClick={onLogout}>Log Out</button>
+                            </div>
+                        )}
+                        {showAccount && (
+                            <div className="dashboard-modal-overlay">
+                                <Account
+                                    userEmail={userEmail}
+                                    userId={auth.currentUser?.uid || ''}
+                                    onClose={() => setShowAccount(false)}
+                                />
+                            </div>
+                        )}
                     </div>
-                    {isProfileMenuOpen && (
-                        <div className="dashboard-profile-menu">
-                            <button onClick={() => setShowAccount(true)}>Account</button>
-                            <button onClick={onLogout}>Log Out</button>
-                        </div>
-                    )}
-                    {showAccount && (
-                        <div className="dashboard-modal-overlay">
-                            <Account
-                                userEmail={userEmail}
-                                userId={auth.currentUser?.uid || ''}
-                                onClose={() => setShowAccount(false)}
-                            />
-                        </div>
-                    )}
-                </div>
-            </header>
+                </header>
 
-            <div className="dashboard-main-content">
-                <nav className="dashboard-side-nav">
-                    {(actualUserRole === 'admin' || actualUserRole === 'developer') && (
+                {(showRenewalBanner || isSubscriptionExpired) && (
+                    <div className={`renewal-banner ${isSubscriptionExpired ? 'expired-warning' : ''}`}>
+                    <span>
+                        {isSubscriptionExpired
+                            ? "⚠️ Your subscription has expired. You can view all data but cannot make changes until renewal."
+                            : `⚠️ Your subscription expires on ${organizationData?.subscriptionEndDate.toDate().toLocaleDateString()}`
+                        }
+                    </span>
+                        <button
+                            onClick={() => {
+                                window.location.href = "mailto:mamie.gartin@icloud.com?subject=Subscription Renewal";
+                            }}
+                            className="renewal-button"
+                        >
+                            Contact Support to Renew
+                        </button>
+                    </div>
+                )}
+
+                <div className="dashboard-main-content">
+                    <nav className="dashboard-side-nav">
+                        {(actualUserRole === 'admin' || actualUserRole === 'developer') && (
+                            <button
+                                className="dashboard-nav-link"
+                                onClick={() => {
+                                    setCurrentScreen('OrganizationEngagements');
+                                    setShowIntakeSession(false);
+                                }}
+                            >
+                                Organization Engagements
+                            </button>
+                        )}
+
+                        {(actualUserRole === 'admin' || actualUserRole === 'developer') && (
+                            <div className="dashboard-nav-section">
+                                <div
+                                    className="dashboard-nav-header"
+                                    onClick={() => setIsOrgMenuExpanded(!isOrgMenuExpanded)}
+                                >
+                                    <span>Organization</span>
+                                    <span className={`dashboard-arrow ${isOrgMenuExpanded ? 'down' : 'right'}`}>▶</span>
+                                </div>
+                                {isOrgMenuExpanded && (
+                                    <div className="dashboard-nav-items">
+                                        {organizationItems.map(item => (
+                                            <button
+                                                key={item}
+                                                onClick={() => {
+                                                    setCurrentScreen(item);
+                                                    setShowIntakeSession(false);
+                                                }}
+                                                className="dashboard-nav-item"
+                                            >
+                                                {item}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <button
                             className="dashboard-nav-link"
                             onClick={() => {
-                                setCurrentScreen('OrganizationEngagements');
+                                setCurrentScreen('Reports');
                                 setShowIntakeSession(false);
                             }}
                         >
-                            Organization Engagements
+                            Reports
                         </button>
-                    )}
+                        <button
+                            className="dashboard-nav-link"
+                            onClick={() => {
+                                setCurrentScreen('GroupEngagements');
+                                setShowIntakeSession(false);
+                            }}
+                        >
+                            Group Engagements
+                        </button>
+                        <button
+                            className="dashboard-nav-link"
+                            onClick={() => {
+                                setCurrentScreen('CreateOrganizationRecap');
+                                setShowIntakeSession(false);
+                            }}
+                        >
+                            Create Public Awareness/Impact Event
+                        </button>
+                        <button
+                            className="dashboard-nav-link"
+                            onClick={() => {
+                                setCurrentScreen('Participants');
+                                setShowIntakeSession(false);
+                                setSelectedParticipantId(null);
+                            }}
+                        >
+                            Participants
+                        </button>
+                    </nav>
 
-
-                    {(actualUserRole === 'admin' || actualUserRole === 'developer') && (
-                        <div className="dashboard-nav-section">
-                            <div
-                                className="dashboard-nav-header"
-                                onClick={() => setIsOrgMenuExpanded(!isOrgMenuExpanded)}
-                            >
-                                <span>Organization</span>
-                                <span className={`dashboard-arrow ${isOrgMenuExpanded ? 'down' : 'right'}`}>▶</span>
-                            </div>
-                            {isOrgMenuExpanded && (
-                                <div className="dashboard-nav-items">
-                                    {organizationItems.map(item => (
-                                        <button
-                                            key={item}
-                                            onClick={() => {
-                                                setCurrentScreen(item);
-                                                setShowIntakeSession(false);
-                                            }}
-                                            className="dashboard-nav-item"
-                                        >
-                                            {item}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <button
-                        className="dashboard-nav-link"
-                        onClick={() => {
-                            setCurrentScreen('Reports');
-                            setShowIntakeSession(false);
-                        }}
-                    >
-                        Reports
-                    </button>
-                    <button
-                        className="dashboard-nav-link"
-                        onClick={() => {
-                            setCurrentScreen('GroupEngagements');
-                            setShowIntakeSession(false);
-                        }}
-                    >
-                        Group Engagements
-                    </button>
-                    <button
-                        className="dashboard-nav-link"
-                        onClick={() => {
-                            setCurrentScreen('CreateOrganizationRecap');
-                            setShowIntakeSession(false);
-                        }}
-                    >
-                        Create Public Awareness/Impact Event
-                    </button>
-                    <button
-                        className="dashboard-nav-link"
-                        onClick={() => {
-                            setCurrentScreen('Participants');
-                            setShowIntakeSession(false);
-                            setSelectedParticipantId(null);
-                        }}
-                    >
-                        Participants
-                    </button>
-                </nav>
-
-                <main className="dashboard-content-area">
-                    {renderContent()}
-                </main>
+                    <main className="dashboard-content-area">
+                        {renderContent()}
+                    </main>
+                </div>
             </div>
-        </div>
+        </SubscriptionContext.Provider>
     );
 };

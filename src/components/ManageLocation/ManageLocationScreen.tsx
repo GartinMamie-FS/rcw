@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc, getDoc} from 'firebase/firestore';
 import './ManageLocationScreen.css';
 import { LocationForm } from './LocationForm';
+import { useContext } from 'react';
+import { SubscriptionContext } from '../../context/SubscriptionContext';
 
 interface Location {
     name: string;
@@ -17,10 +19,10 @@ interface ManageLocationsScreenProps {
     organizationId: string;
 }
 
-
 export const ManageLocationsScreen: React.FC<ManageLocationsScreenProps> = ({ organizationId }) => {
     const [showLocationForm, setShowLocationForm] = useState(false);
     const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+    const { isExpired } = useContext(SubscriptionContext);
 
     const renderContent = () => {
         if (showLocationForm) {
@@ -46,12 +48,20 @@ export const ManageLocationsScreen: React.FC<ManageLocationsScreenProps> = ({ or
             <div className="manage-locations-screen">
                 <div className="header-container">
                     <h2>Manage Locations</h2>
-                    <button
-                        className="create-button"
-                        onClick={() => setShowLocationForm(true)}
-                    >
-                        Create New Location
-                    </button>
+                    <div className="create-button-container">
+                        <button
+                            className={`create-button ${isExpired ? 'disabled' : ''}`}
+                            onClick={() => setShowLocationForm(true)}
+                            disabled={isExpired}
+                        >
+                            Create New Location
+                        </button>
+                        {isExpired && (
+                            <div className="expired-message">
+                                Subscription renewal required to create new locations
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <LocationsTable
                     organizationId={organizationId}
@@ -63,6 +73,7 @@ export const ManageLocationsScreen: React.FC<ManageLocationsScreenProps> = ({ or
 
     return renderContent();
 };
+
 
 interface LocationsTableProps {
     organizationId: string;

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore';
 import { useOrganization } from '../../context/OrganizationContext';
 import './CreateOrganizationRecap.css';
+import { useContext } from 'react';
+import { SubscriptionContext } from '../../context/SubscriptionContext';
 
 interface RecapType {
     id: string;
@@ -35,13 +37,14 @@ interface CreateOrganizationRecapScreenProps {
 }
 
 export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScreenProps> = ({ onBack }) => {
-    const { organizationId } = useOrganization();
+    const {organizationId} = useOrganization();
     const [recapName, setRecapName] = useState('');
     const [selectedRecapType, setSelectedRecapType] = useState<RecapType | null>(null);
     const [recapTypes, setRecapTypes] = useState<RecapType[]>([]);
-    const [formData, setFormData] = useState<{[key: string]: any}>({});
+    const [formData, setFormData] = useState<{ [key: string]: any }>({});
     const [recaps, setRecaps] = useState<RecapWithId[]>([]);
     const [selectedRecap, setSelectedRecap] = useState<RecapWithId | null>(null);
+    const {isExpired} = useContext(SubscriptionContext);
 
     useEffect(() => {
         const loadRecapTypes = async () => {
@@ -91,7 +94,7 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
         const db = getFirestore();
 
         // Format the date from the form data
-        const formattedData = { ...formData };
+        const formattedData = {...formData};
         selectedRecapType.fields.forEach(field => {
             if (field.type === 'date' && formData[field.id]) {
                 // Convert YYYY-MM-DD to MM/DD/YYYY
@@ -250,13 +253,20 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
                     {renderFormFields()}
 
                     <div className="org-recap-button-container">
-                        <button
-                            type="submit"
-                            className="org-recap-submit-button"
-                            disabled={!recapName.trim() || !organizationId || !selectedRecapType}
-                        >
-                            Create Activity
-                        </button>
+                        <div className="create-button-container">
+                            <button
+                                type="submit"
+                                className={`org-recap-submit-button ${isExpired ? 'disabled' : ''}`}
+                                disabled={!recapName.trim() || !organizationId || !selectedRecapType || isExpired}
+                            >
+                                Create Activity
+                            </button>
+                            {isExpired && (
+                                <div className="expired-message">
+                                    Subscription renewal required to create new activities
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </form>
             </div>

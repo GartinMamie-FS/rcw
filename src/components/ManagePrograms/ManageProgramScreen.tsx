@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, addDoc, updateDoc} from 'firebase/firestore';
 import './ManagePrograms.css';
 import { ProgramDetailsScreen } from './ProgramDetailsScreen';
+import { useContext } from 'react';
+import { SubscriptionContext } from '../../context/SubscriptionContext';
 
 interface Program {
     name: string;
@@ -21,6 +23,7 @@ interface ManageProgramsScreenProps {
 export const ManageProgramsScreen: React.FC<ManageProgramsScreenProps> = ({ organizationId }) => {
     const [showProgramForm, setShowProgramForm] = useState(false);
     const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+    const { isExpired } = useContext(SubscriptionContext);
 
     const renderContent = () => {
         if (showProgramForm) {
@@ -46,12 +49,20 @@ export const ManageProgramsScreen: React.FC<ManageProgramsScreenProps> = ({ orga
             <div className="manage-programs-screen">
                 <div className="header-container">
                     <h2>Manage Programs</h2>
-                    <button
-                        className="create-button"
-                        onClick={() => setShowProgramForm(true)}
-                    >
-                        Create New Program
-                    </button>
+                    <div className="create-button-container">
+                        <button
+                            className={`create-button ${isExpired ? 'disabled' : ''}`}
+                            onClick={() => setShowProgramForm(true)}
+                            disabled={isExpired}
+                        >
+                            Create New Program
+                        </button>
+                        {isExpired && (
+                            <div className="expired-message">
+                                Subscription renewal required to create new programs
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <ProgramsTable
                     organizationId={organizationId}

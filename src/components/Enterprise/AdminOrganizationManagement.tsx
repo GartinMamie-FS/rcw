@@ -8,31 +8,39 @@ interface AdminOrganizationManagementProps {
 }
 
 export const AdminOrganizationManagement: React.FC<AdminOrganizationManagementProps> = ({ organizationId }) => {
-    const [selectedView, setSelectedView] = useState<'add' | 'view'>('add');
+    const [selectedView, setSelectedView] = useState<'add' | 'view'>('view');
 
     return (
-        <div className="org-management-container">
-            <div className="org-management-nav-panel">
-                <div className="org-management-nav-links">
-                    <button
-                        className={`org-management-nav-button ${selectedView === 'add' ? 'active' : ''}`}
-                        onClick={() => setSelectedView('add')}
-                    >
-                        Add Staff
-                    </button>
-                    <button
-                        className={`org-management-nav-button ${selectedView === 'view' ? 'active' : ''}`}
-                        onClick={() => setSelectedView('view')}
-                    >
-                        View Staff
-                    </button>
+        <div className="group-engagements-screen">
+            <h2>Manage Organization Staff</h2>
+
+            <div className="content-grid">
+                {/* Navigation Card */}
+                <div className="nav-card">
+                    <div className="nav-buttons">
+                        <button
+                            onClick={() => setSelectedView('view')}
+                            className={`nav-button ${selectedView === 'view' ? 'active' : ''}`}
+                        >
+                            View Staff
+                        </button>
+                        <button
+                            onClick={() => setSelectedView('add')}
+                            className={`nav-button ${selectedView === 'add' ? 'active' : ''}`}
+                        >
+                            Add Staff
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div className="org-management-content">
-                {selectedView === 'add' ?
-                    <AddStaffScreen organizationId={organizationId} /> :
-                    <ViewStaffScreen organizationId={organizationId} />
-                }
+
+                {/* Content Card */}
+                <div className="content-card">
+                    {selectedView === 'add' ? (
+                        <AddStaffScreen organizationId={organizationId}/>
+                    ) : (
+                        <ViewStaffScreen organizationId={organizationId}/>
+                    )}
+                </div>
             </div>
         </div>
     );
