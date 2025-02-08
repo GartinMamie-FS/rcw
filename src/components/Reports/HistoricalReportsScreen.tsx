@@ -100,17 +100,17 @@ export const HistoricalReportsScreen: React.FC = () => {
 
             <div className="report-type-buttons">
                 <ReportTypeButton
-                    text="Organization Wide"
+                    text="Peer Services Reports"
                     selected={selectedReportType === ReportType.ORGANIZATION}
                     onClick={() => setSelectedReportType(ReportType.ORGANIZATION)}
                 />
                 <ReportTypeButton
-                    text="Program Specific"
+                    text="Program Specific Reports"
                     selected={selectedReportType === ReportType.PROGRAM}
                     onClick={() => setSelectedReportType(ReportType.PROGRAM)}
                 />
                 <ReportTypeButton
-                    text="Organization Recaps"
+                    text="Public Awareness/Impact Reports"
                     selected={selectedReportType === ReportType.RECAPS}
                     onClick={() => setSelectedReportType(ReportType.RECAPS)}
                 />
