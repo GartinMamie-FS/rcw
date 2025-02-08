@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, getDocs, Timestamp, doc, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth } from '../../config/firebase';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { initializeApp, deleteApp } from 'firebase/app';
+import { firebaseConfig } from '../../config/firebase';
 import './OrganizationManagement.css';
+
 
 interface Organization {
     id: string;
     name: string;
     email: string;
     createdAt: Timestamp;
+    subscriptionTier: number;
+    subscriptionEndDate: Timestamp;
+    currentUsers: number;
+    maxUsers: number;
 }
 
 export const OrganizationManagementScreen: React.FC = () => {
@@ -19,7 +25,7 @@ export const OrganizationManagementScreen: React.FC = () => {
     const [adminFirstName, setAdminFirstName] = useState('');
     const [adminLastName, setAdminLastName] = useState('');
     const [loading, setLoading] = useState(true);
-    const [developerPassword, setDeveloperPassword] = useState('');
+    const [subscriptionTier, setSubscriptionTier] = useState(1);
     const db = getFirestore();
 
     useEffect(() => {
@@ -41,23 +47,49 @@ export const OrganizationManagementScreen: React.FC = () => {
         }
     };
 
+    const handleUpdateSubscription = async (orgId: string, newTier: number) => {
+        try {
+            const maxUsers = newTier === 1 ? 5 : newTier === 2 ? 15 : 999;
+            const endDate = new Date();
+            endDate.setFullYear(endDate.getFullYear() + 1);
+
+            await setDoc(doc(db, 'organizations', orgId), {
+                subscriptionTier: newTier,
+                subscriptionEndDate: Timestamp.fromDate(endDate),
+                maxUsers: maxUsers
+            }, { merge: true });
+
+            fetchOrganizations();
+        } catch (error) {
+            console.error('Error updating subscription:', error);
+        }
+    };
+
     const handleAddOrganization = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const currentUser = auth.currentUser;
+            const maxUsers = subscriptionTier === 1 ? 5 : subscriptionTier === 2 ? 15 : 999;
+            const endDate = new Date();
+            endDate.setFullYear(endDate.getFullYear() + 1);
 
             const newOrg = {
                 name: newOrgName,
                 email: newOrgEmail,
-                createdAt: Timestamp.now()
+                createdAt: Timestamp.now(),
+                subscriptionTier: subscriptionTier,
+                subscriptionEndDate: Timestamp.fromDate(endDate),
+                currentUsers: 1,
+                maxUsers: maxUsers
             };
 
             const orgDoc = await addDoc(collection(db, 'organizations'), newOrg);
 
-            await signOut(auth);
+            // Create secondary app for new user creation
+            const secondaryApp = initializeApp(firebaseConfig, 'secondary');
+            const secondaryAuth = getAuth(secondaryApp);
 
             const userCredential = await createUserWithEmailAndPassword(
-                auth,
+                secondaryAuth,
                 newOrgEmail,
                 adminPassword
             );
@@ -71,21 +103,16 @@ export const OrganizationManagementScreen: React.FC = () => {
                 createdAt: Timestamp.now()
             });
 
-            await signOut(auth);
+            // Clean up secondary app
+            await deleteApp(secondaryApp);
 
-            if (currentUser) {
-                await signInWithEmailAndPassword(
-                    auth,
-                    currentUser.email!,
-                    developerPassword
-                );
-            }
-
+            // Reset form
             setNewOrgName('');
             setNewOrgEmail('');
             setAdminPassword('');
             setAdminFirstName('');
             setAdminLastName('');
+            setSubscriptionTier(1);
             fetchOrganizations();
 
         } catch (error) {
@@ -156,20 +183,23 @@ export const OrganizationManagementScreen: React.FC = () => {
                     </div>
 
                     <div className="form-group">
-                        <label>Developer Password *</label>
-                        <input
-                            type="password"
-                            value={developerPassword}
-                            onChange={(e) => setDeveloperPassword(e.target.value)}
+                        <label>Subscription Tier *</label>
+                        <select
+                            value={subscriptionTier}
+                            onChange={(e) => setSubscriptionTier(Number(e.target.value))}
                             className="form-input"
                             required
-                        />
+                        >
+                            <option value={1}>Tier 1 (5 users)</option>
+                            <option value={2}>Tier 2 (15 users)</option>
+                            <option value={3}>Tier 3 (Unlimited)</option>
+                        </select>
                     </div>
 
                     <button
                         type="submit"
                         className="save-button"
-                        disabled={!newOrgName || !newOrgEmail || !adminPassword || !adminFirstName || !adminLastName || !developerPassword}
+                        disabled={!newOrgName || !newOrgEmail || !adminPassword || !adminFirstName || !adminLastName}
                     >
                         Add Organization
                     </button>
@@ -186,6 +216,18 @@ export const OrganizationManagementScreen: React.FC = () => {
                             <div key={org.id} className="organization-card">
                                 <h3>{org.name}</h3>
                                 <p>{org.email}</p>
+                                <p>Subscription Tier: {org.subscriptionTier}</p>
+                                <p>Users: {org.currentUsers}/{org.maxUsers}</p>
+                                <p>Subscription Ends: {org.subscriptionEndDate?.toDate().toLocaleDateString()}</p>
+                                <select
+                                    onChange={(e) => handleUpdateSubscription(org.id, Number(e.target.value))}
+                                    value={org.subscriptionTier}
+                                    className="tier-select"
+                                >
+                                    <option value={1}>Tier 1 (5 users)</option>
+                                    <option value={2}>Tier 2 (15 users)</option>
+                                    <option value={3}>Tier 3 (Unlimited)</option>
+                                </select>
                                 <p className="created-date">
                                     Created: {org.createdAt.toDate().toLocaleDateString()}
                                 </p>

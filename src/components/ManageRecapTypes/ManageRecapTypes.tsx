@@ -93,8 +93,8 @@ const RecapTypeForm: React.FC<{
                     <p className="example-title">Community Collaboration:</p>
                     <ul>
                         <li>Field 1: Date</li>
-                        <li>Field 2: Details</li>
-                        <li>Field 3: Number of Participants</li>
+                        <li>Field 2: Description</li>
+                        <li>Field 3: # Attended</li>
                     </ul>
                 </div>
                 <div className="field-example-column">

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getFirestore } from 'firebase/firestore';
-import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth } from '../../config/firebase';
+import { collection, getDocs, query, where, doc, setDoc, getDoc, increment } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { initializeApp, deleteApp } from 'firebase/app';
 import './AddStaffScreen.css';
+
 
 interface AddStaffScreenProps {
     organizationId: string;
@@ -16,12 +17,29 @@ export const AddStaffScreen: React.FC<AddStaffScreenProps> = ({ organizationId }
     const [staffRole, setStaffRole] = useState('staff');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [currentAdminPassword, setCurrentAdminPassword] = useState('');
+    const [userCount, setUserCount] = useState(0);
+    const [maxUsers, setMaxUsers] = useState(0);
+
+    // Add this useEffect to fetch organization details
+    useEffect(() => {
+        const fetchOrgDetails = async () => {
+            const orgDoc = await getDoc(doc(db, 'organizations', organizationId));
+            if (orgDoc.exists()) {
+                const orgData = orgDoc.data();
+                setMaxUsers(orgData.maxUsers);
+                setUserCount(orgData.currentUsers);
+            }
+        };
+        fetchOrgDetails();
+    }, [organizationId, db]);
 
     const handleAddStaff = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const currentUser = auth.currentUser;
+            if (userCount >= maxUsers) {
+                alert('User limit reached for your subscription tier. Please upgrade to add more users.');
+                return;
+            }
 
             const userQuery = query(
                 collection(db, 'organizations', organizationId, 'users'),
@@ -34,14 +52,28 @@ export const AddStaffScreen: React.FC<AddStaffScreenProps> = ({ organizationId }
                 return;
             }
 
-            await signOut(auth);
+            // Initialize a secondary Firebase app
+            const secondaryApp = initializeApp({
+                // Copy your firebase config from config/firebase.ts
+                apiKey: "AIzaSyBHDKop-D6gvQG4z4ZF_tfDxBpA7xgS27s",
+                authDomain: "recovery-connect-web.firebaseapp.com",
+                projectId: "recovery-connect-web",
+                storageBucket: "recovery-connect-web.firebasestorage.app",
+                messagingSenderId: "236368090937",
+                appId: "1:236368090937:web:4b51ca50282c136b323ae8",
+                measurementId: "G-3C7NGJK7V9"
+            }, 'Secondary');
 
+            const secondaryAuth = getAuth(secondaryApp);
+
+            // Create new user with secondary auth instance
             const userCredential = await createUserWithEmailAndPassword(
-                auth,
+                secondaryAuth,
                 staffEmail,
                 staffPassword
             );
 
+            // Create the user document
             await setDoc(doc(db, 'organizations', organizationId, 'users', userCredential.user.uid), {
                 uid: userCredential.user.uid,
                 email: staffEmail,
@@ -51,24 +83,30 @@ export const AddStaffScreen: React.FC<AddStaffScreenProps> = ({ organizationId }
                 createdAt: new Date()
             });
 
-            await signOut(auth);
+            // Update organization's user count
+            await setDoc(doc(db, 'organizations', organizationId), {
+                currentUsers: increment(1)
+            }, { merge: true });
 
-            if (currentUser) {
-                await signInWithEmailAndPassword(auth, currentUser.email!, currentAdminPassword);
-            }
+            // Clean up secondary app
+            await deleteApp(secondaryApp);
 
+
+            // Reset form
+            setUserCount(prev => prev + 1);
             setStaffEmail('');
             setStaffPassword('');
             setStaffRole('staff');
             setFirstName('');
             setLastName('');
-            setCurrentAdminPassword('');
             alert('Staff member added successfully!');
+
         } catch (error) {
             console.error('Detailed error:', error);
             alert('Error adding staff member. Check console for details.');
         }
     };
+
 
     return (
         <div className="add-staff-container">
@@ -76,6 +114,14 @@ export const AddStaffScreen: React.FC<AddStaffScreenProps> = ({ organizationId }
                 <h2>Add Staff Member</h2>
                 <p className="add-staff-required-text">* indicates required field</p>
 
+                <div className="user-count-info">
+                    <p>Current Users: {userCount} / {maxUsers}</p>
+                    {userCount >= maxUsers && (
+                        <p className="limit-warning">
+                            User limit reached. Please upgrade your subscription to add more users.
+                        </p>
+                    )}
+                </div>
                 <form onSubmit={handleAddStaff}>
                     <div className="add-staff-form-group">
                         <label>First Name *</label>
@@ -123,17 +169,6 @@ export const AddStaffScreen: React.FC<AddStaffScreenProps> = ({ organizationId }
                     </div>
 
                     <div className="add-staff-form-group">
-                        <label>Your Password (Required to maintain session) *</label>
-                        <input
-                            type="password"
-                            value={currentAdminPassword}
-                            onChange={(e) => setCurrentAdminPassword(e.target.value)}
-                            className="add-staff-input"
-                            required
-                        />
-                    </div>
-
-                    <div className="add-staff-form-group">
                         <label>Role *</label>
                         <select
                             value={staffRole}
@@ -149,7 +184,7 @@ export const AddStaffScreen: React.FC<AddStaffScreenProps> = ({ organizationId }
                     <button
                         type="submit"
                         className="add-staff-submit-button"
-                        disabled={!staffEmail || !staffPassword || !firstName || !lastName || !currentAdminPassword}
+                        disabled={!staffEmail || !staffPassword || !firstName || !lastName}
                     >
                         Add Staff Member
                     </button>

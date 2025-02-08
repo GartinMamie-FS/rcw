@@ -16,13 +16,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
-// Initialize services
-export const auth = getAuth(app);
-export const firestore = getFirestore(app);
-export const database = getDatabase(app);
+// Initialize and export services
+export const auth = getAuth();
+export const firestore = getFirestore();
+export const database = getDatabase();
 export let analytics: any = null;
+
 isSupported().then(supported => {
     if (supported) {
         analytics = getAnalytics(app);
@@ -34,3 +35,6 @@ if (process.env.NODE_ENV === 'development') {
     // @ts-ignore
     window.firebase = { auth, firestore, database, analytics };
 }
+
+// Export the config for secondary apps
+export { firebaseConfig };

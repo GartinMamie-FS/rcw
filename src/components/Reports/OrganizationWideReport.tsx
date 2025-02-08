@@ -8,6 +8,7 @@ import {
     orderBy,
     limit,
     doc,
+    getDoc,
     setDoc,
     serverTimestamp,
 } from 'firebase/firestore';
@@ -67,77 +68,85 @@ export const OrganizationWideReport: React.FC<OrganizationWideReportProps> = () 
             const countedParticipants = new Set();
 
             for (const participantDoc of participantsSnapshot.docs) {
-                const participantServicesRef = collection(
+                const lastEngagementRef = doc(
                     db,
                     'organizations',
                     organizationId,
                     'participants',
                     participantDoc.id,
-                    'participantServices'
+                    'lastEngagement',
+                    'current'
                 );
-                const participantServicesSnap = await getDocs(participantServicesRef);
+                const lastEngagement = await getDoc(lastEngagementRef);
+                const lastEngagementDate = lastEngagement.data()?.date;
 
-                let hasServicesInMonth = false;
+                if (lastEngagementDate) {
+                    const [month, day, year] = lastEngagementDate.split('/');
+                    const engagementDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
-                participantServicesSnap.forEach(serviceDoc => {
-                    const servicesData = serviceDoc.data();
-                    const createdAt = servicesData.createdAt?.toDate() || new Date(servicesData.createdAt);
+                    if (engagementDate >= startOfMonth && engagementDate <= endOfMonth) {
+                        const participantServicesRef = collection(
+                            db,
+                            'organizations',
+                            organizationId,
+                            'participants',
+                            participantDoc.id,
+                            'participantServices'
+                        );
+                        const participantServicesSnap = await getDocs(participantServicesRef);
 
-                    if (createdAt >= startOfMonth && createdAt <= endOfMonth) {
-                        hasServicesInMonth = true;
-                        const services = servicesData.services || [];
-                        services.forEach((service: any) => {
-                            if (service.serviceId) {
-                                serviceCountMap[service.serviceId] = (serviceCountMap[service.serviceId] || 0) + (service.count || 1);
-                            }
+                        countedParticipants.add(participantDoc.id);
+
+                        participantServicesSnap.forEach(serviceDoc => {
+                            const servicesData = serviceDoc.data();
+                            const services = servicesData.services || [];
+                            services.forEach((service: any) => {
+                                if (service.serviceId) {
+                                    serviceCountMap[service.serviceId] = (serviceCountMap[service.serviceId] || 0) + (service.count || 1);
+                                }
+                            });
                         });
-                    }
-                });
 
-                if (hasServicesInMonth) {
-                    countedParticipants.add(participantDoc.id);
-                }
+                        const programRef = collection(
+                            db,
+                            'organizations',
+                            organizationId,
+                            'participants',
+                            participantDoc.id,
+                            'participantProgram'
+                        );
+                        const programQuery = query(programRef, orderBy('createdAt', 'desc'), limit(1));
+                        const programSnap = await getDocs(programQuery);
 
-                // Program and Location logic remains the same
-                const programRef = collection(
-                    db,
-                    'organizations',
-                    organizationId,
-                    'participants',
-                    participantDoc.id,
-                    'participantProgram'
-                );
-                const programQuery = query(programRef, orderBy('createdAt', 'desc'), limit(1));
-                const programSnap = await getDocs(programQuery);
+                        if (!programSnap.empty) {
+                            const programData = programSnap.docs[0].data();
+                            if (programData.programs && programData.programs.length > 0) {
+                                const programId = programData.programs[0].programId;
+                                programCountMap[programId] = (programCountMap[programId] || 0) + 1;
+                            }
+                        }
 
-                if (!programSnap.empty) {
-                    const programData = programSnap.docs[0].data();
-                    if (programData.programs && programData.programs.length > 0) {
-                        const programId = programData.programs[0].programId;
-                        programCountMap[programId] = (programCountMap[programId] || 0) + 1;
-                    }
-                }
+                        const locationRef = collection(
+                            db,
+                            'organizations',
+                            organizationId,
+                            'participants',
+                            participantDoc.id,
+                            'participantLocation'
+                        );
+                        const locationQuery = query(locationRef, orderBy('createdAt', 'desc'), limit(1));
+                        const locationSnap = await getDocs(locationQuery);
 
-                const locationRef = collection(
-                    db,
-                    'organizations',
-                    organizationId,
-                    'participants',
-                    participantDoc.id,
-                    'participantLocation'
-                );
-                const locationQuery = query(locationRef, orderBy('createdAt', 'desc'), limit(1));
-                const locationSnap = await getDocs(locationQuery);
-
-                if (!locationSnap.empty) {
-                    const locationName = locationSnap.docs[0].data().location;
-                    if (locationName) {
-                        locationCountMap[locationName] = (locationCountMap[locationName] || 0) + 1;
+                        if (!locationSnap.empty) {
+                            const locationName = locationSnap.docs[0].data().location;
+                            if (locationName) {
+                                locationCountMap[locationName] = (locationCountMap[locationName] || 0) + 1;
+                            }
+                        }
                     }
                 }
             }
 
-            // Fetch and set services, programs, and locations data
             const servicesQuery = query(
                 collection(db, 'organizations', organizationId, 'services')
             );
@@ -173,6 +182,8 @@ export const OrganizationWideReport: React.FC<OrganizationWideReportProps> = () 
 
         fetchData();
     }, [organizationId, selectedMonth]);
+
+
 
 
     const generatePDF = () => {

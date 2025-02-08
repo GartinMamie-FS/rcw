@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, query, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, query, getDocs, deleteDoc, doc, setDoc, increment } from 'firebase/firestore';
 import './ViewStaffScreen.css';
 import { EditStaffScreen } from './EditStaffScreen';
 
@@ -39,10 +39,17 @@ export const ViewStaffScreen: React.FC<ViewStaffScreenProps> = ({ organizationId
 
     const handleDelete = async (staffId: string) => {
         if (window.confirm('Are you sure you want to delete this staff member?')) {
-            await deleteDoc(doc(db, 'users', staffId));
+            await deleteDoc(doc(db, 'organizations', organizationId, 'users', staffId));
+
+            // Update the organization's user count
+            await setDoc(doc(db, 'organizations', organizationId), {
+                currentUsers: increment(-1)
+            }, { merge: true });
+
             fetchStaffMembers();
         }
     };
+
 
     return (
         <div className="view-staff-container">

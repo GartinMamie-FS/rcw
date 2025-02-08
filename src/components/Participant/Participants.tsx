@@ -93,7 +93,7 @@ export const Participants: React.FC<ParticipantsProps> = ({ onNewIntake, onViewP
     return (
         <div className="participants-container">
             <div className="participants-header">
-                <h2>All Participants</h2>
+                <h2>All Participants ({filteredParticipants.length})</h2>
                 <button
                     className="new-intake-button"
                     onClick={onNewIntake}

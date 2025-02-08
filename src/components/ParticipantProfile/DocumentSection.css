@@ -1,15 +1,16 @@
 .documents-section {
     padding: 20px;
+    width: 100%;
 }
 
-.section-header {
+.documents-section .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
-.add-button {
+.documents-section .add-button {
     padding: 8px 16px;
     background-color: #1976d2;
     color: white;
@@ -18,44 +19,42 @@
     cursor: pointer;
 }
 
-.documents-table {
+.documents-section .documents-table {
     border: 1px solid #e0e0e0;
     border-radius: 4px;
 }
 
-.table-header {
+.documents-section .table-header {
     display: flex;
     background-color: #f5f5f5;
     padding: 12px;
     font-weight: bold;
 }
 
-.header-cell {
-    flex: 1;
-    padding: 0 8px;
-}
-
-.table-body {
+.documents-section .table-body {
     max-height: 500px;
     overflow-y: auto;
 }
 
-.table-row {
+.documents-section .table-row {
     display: flex;
     padding: 12px;
     border-bottom: 1px solid #e0e0e0;
 }
 
-.table-cell {
-    flex: 1;
+.documents-section .table-cell {
     padding: 0 8px;
 }
 
-.view-button {
+.documents-section .view-button {
     padding: 4px 12px;
     background-color: #1976d2;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.documents-section .view-button:hover {
+    background-color: #1565c0;
 }

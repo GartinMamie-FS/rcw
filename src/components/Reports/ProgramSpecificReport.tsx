@@ -28,7 +28,24 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
     const [locations, setLocations] = useState<LocationWithParticipantCount[]>([]);
     const [programParticipants, setProgramParticipants] = useState(0);
     const [isSaving, setIsSaving] = useState(false);
-    const currentMonth = new Date().toLocaleString('default', {month: 'long'});
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const today = new Date();
+        return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    });
+
+    const getLastTwelveMonths = () => {
+        const months = [];
+        const today = new Date();
+
+        for (let i = 0; i < 12; i++) {
+            const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            months.push({
+                value: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`,
+                label: date.toLocaleDateString('default', { month: 'long', year: 'numeric' })
+            });
+        }
+        return months;
+    };
 
     useEffect(() => {
         if (!programName || !organizationId) return;
@@ -39,6 +56,10 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
             setLocations([]);
             const serviceCountMap: { [key: string]: number } = {};
             const locationCountMap: { [key: string]: number } = {};
+
+            const [year, month] = selectedMonth.split('-');
+            const startOfMonth = new Date(parseInt(year), parseInt(month) - 1, 1);
+            const endOfMonth = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59);
 
             const programsRef = collection(db, 'organizations', organizationId, 'programs');
             const programQuery = query(programsRef, where('name', '==', programName));
@@ -82,7 +103,7 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
                         const lastEngagement = await getDoc(lastEngagementRef);
                         const engagementDate = lastEngagement.data()?.date;
 
-                        if (isDateInSelectedMonth(engagementDate, currentMonth)) {
+                        if (isDateInRange(engagementDate, startOfMonth, endOfMonth)) {
                             participantCount++;
 
                             const participantServices = await getDocs(
@@ -134,12 +155,14 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
         };
 
         fetchProgramData();
-    }, [programName, currentMonth, organizationId]);
+    }, [programName, selectedMonth, organizationId]);
 
     const generatePDF = () => {
         const doc = new jsPDF();
-        const currentMonth = new Date().toLocaleString('default', {month: 'long'});
-        const currentYear = new Date().getFullYear().toString();
+        const [year, month] = selectedMonth.split('-');
+        const reportDate = new Date(parseInt(year), parseInt(month) - 1);
+        const reportMonth = reportDate.toLocaleString('default', { month: 'long' });
+        const reportYear = reportDate.getFullYear().toString();
 
         doc.setFontSize(18);
         doc.text(`${programName} Program Report`, 105, 20, {align: 'center'});
@@ -165,7 +188,7 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
         yPos += 10;
         doc.text(`Un-Duplicated Program Participants: ${programParticipants}`, 20, yPos);
 
-        doc.save(`${programName}Report_${currentMonth}_${currentYear}.pdf`);
+        doc.save(`${programName}Report_${reportMonth}_${reportYear}.pdf`);
         return doc.output('arraybuffer');
     };
 
@@ -181,22 +204,24 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
         try {
             const db = getFirestore();
             const storage = getStorage();
-            const currentMonth = new Date().toLocaleString('default', { month: 'long' });
-            const currentYear = new Date().getFullYear().toString();
-            console.log('Generating PDF...');
+            const [year, month] = selectedMonth.split('-');
+            const reportDate = new Date(parseInt(year), parseInt(month) - 1);
+            const reportMonth = reportDate.toLocaleString('default', { month: 'long' });
+            const reportYear = reportDate.getFullYear().toString();
 
+            console.log('Generating PDF...');
             const pdfBytes = generatePDF();
             console.log('PDF generated successfully');
 
             const storageRef = ref(storage,
-                `organizations/${organizationId}/reports/programs/${programName}_${currentMonth}${currentYear}.pdf`
+                `organizations/${organizationId}/reports/programs/${programName}_${reportMonth}${reportYear}.pdf`
             );
             console.log('Uploading to storage path:', storageRef.fullPath);
 
             await uploadBytes(storageRef, pdfBytes);
             console.log('PDF uploaded successfully');
 
-            const monthlyReportRef = doc(db, 'organizations', organizationId, 'monthlyReports', `${currentMonth}-${currentYear}`);
+            const monthlyReportRef = doc(db, 'organizations', organizationId, 'monthlyReports', `${reportMonth}-${reportYear}`);
             await setDoc(monthlyReportRef, {
                 programReports: true,
                 lastUpdated: serverTimestamp()
@@ -212,8 +237,29 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
         }
     };
 
+    function isDateInRange(dateStr: string | undefined, start: Date, end: Date): boolean {
+        if (!dateStr) return false;
+        const [month, day, year] = dateStr.split('/');
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        return date >= start && date <= end;
+    }
+
     return (
         <div className="program-report">
+            <div className="month-selector-container">
+                <select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="month-selector"
+                >
+                    {getLastTwelveMonths().map(month => (
+                        <option key={month.value} value={month.value}>
+                            {month.label}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="report-actions">
                 <button
                     className="save-report-button"
@@ -263,10 +309,3 @@ export const ProgramSpecificReport: React.FC<ProgramSpecificReportProps> = ({ pr
         </div>
     );
 };
-
-
-function isDateInSelectedMonth(dateStr: string | undefined, selectedMonth: string): boolean {
-    if (!dateStr) return false;
-    const date = new Date(dateStr);
-    return date.toLocaleString('default', { month: 'long' }) === selectedMonth;
-}

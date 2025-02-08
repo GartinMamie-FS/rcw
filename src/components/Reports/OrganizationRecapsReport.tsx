@@ -42,7 +42,9 @@ export const OrganizationRecapsReport: React.FC = () => {
 
             const summaries = recapsSnapshot.docs.reduce((acc: { [key: string]: RecapSummary }, doc) => {
                 const data = doc.data();
-                const recapDate = new Date(data.date);
+                // Parse the date string (MM/DD/YYYY) into Date object
+                const [month, day, year] = data.date.split('/');
+                const recapDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
 
                 if (recapDate.getFullYear() !== parseInt(selectedYear) ||
                     recapDate.getMonth() !== parseInt(selectedMonthNum) - 1) {
@@ -76,6 +78,7 @@ export const OrganizationRecapsReport: React.FC = () => {
 
         fetchRecaps();
     }, [organizationId, selectedMonth]);
+
 
     const generatePDF = () => {
         const doc = new jsPDF();

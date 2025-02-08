@@ -59,17 +59,17 @@ export const DocumentsSection: React.FC<{ participantId: string, onAddClick: () 
 
             <div className="documents-table">
                 <div className="table-header">
-                    <div className="header-cell">Date</div>
-                    <div className="header-cell">Document Name</div>
-                    <div className="header-cell">Action</div>
+                    <div className="header-cell" style={{flex: 1}}>Date</div>
+                    <div className="header-cell" style={{flex: 2}}>Document Name</div>
+                    <div className="header-cell" style={{flex: 0.5}}>Action</div>
                 </div>
 
                 <div className="table-body">
                     {documents.map(doc => (
                         <div key={doc.id} className="table-row">
-                            <div className="table-cell">{doc.document.date}</div>
-                            <div className="table-cell">{doc.document.name}</div>
-                            <div className="table-cell">
+                            <div className="table-cell" style={{flex: 1}}>{doc.document.date}</div>
+                            <div className="table-cell" style={{flex: 2}}>{doc.document.name}</div>
+                            <div className="table-cell" style={{flex: 0.5}}>
                                 <button
                                     onClick={() => window.open(doc.document.fileUrl, '_blank')}
                                     className="view-button"

@@ -184,7 +184,7 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({ organizationId }) 
     return (
         <div className="report-options">
             <div className="header-row">
-                <h2>Current Month Reports</h2>
+                <h2>Monthly Reports</h2>
                 <button
                     className="view-past-button"
                     onClick={() => setShowHistorical(true)}
@@ -205,12 +205,12 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({ organizationId }) 
                     onClick={() => setSelectedReportType(ReportType.RECAPS)}
                 />
                 <ReportTypeButton
-                    text="Organization Wide"
+                    text="Peer Services Report"
                     selected={selectedReportType === ReportType.ORGANIZATION}
                     onClick={() => setSelectedReportType(ReportType.ORGANIZATION)}
                 />
                 <ReportTypeButton
-                    text="Program Specific"
+                    text="Program Specific Report"
                     selected={selectedReportType === ReportType.PROGRAM}
                     onClick={() => setSelectedReportType(ReportType.PROGRAM)}
                 />

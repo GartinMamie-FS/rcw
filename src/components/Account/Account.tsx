@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import './Account.css';
 
 interface AccountProps {
@@ -17,11 +17,21 @@ export const Account: React.FC<AccountProps> = ({ userEmail, userId, onClose }) 
     useEffect(() => {
         const fetchUserData = async () => {
             const db = getFirestore();
-            const userDoc = await getDoc(doc(db, 'users', userId));
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
-                setFirstName(userData.firstName || '');
-                setLastName(userData.lastName || '');
+            // Get all organizations
+            const orgsRef = collection(db, 'organizations');
+            const orgsSnapshot = await getDocs(orgsRef);
+
+            // Find the organization where this user exists
+            for (const orgDoc of orgsSnapshot.docs) {
+                const userRef = doc(db, 'organizations', orgDoc.id, 'users', userId);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    setFirstName(userData.firstName || '');
+                    setLastName(userData.lastName || '');
+                    break;
+                }
             }
         };
         fetchUserData();
@@ -32,11 +42,23 @@ export const Account: React.FC<AccountProps> = ({ userEmail, userId, onClose }) 
         setIsLoading(true);
         try {
             const db = getFirestore();
-            await updateDoc(doc(db, 'users', userId), {
-                firstName,
-                lastName,
-                updatedAt: new Date()
-            });
+            // Find the organization first
+            const orgsRef = collection(db, 'organizations');
+            const orgsSnapshot = await getDocs(orgsRef);
+
+            for (const orgDoc of orgsSnapshot.docs) {
+                const userRef = doc(db, 'organizations', orgDoc.id, 'users', userId);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    await updateDoc(userRef, {
+                        firstName,
+                        lastName,
+                        updatedAt: new Date()
+                    });
+                    break;
+                }
+            }
             setMessage('Profile updated successfully!');
             setTimeout(() => onClose(), 1500);
         } catch (error) {
@@ -44,6 +66,7 @@ export const Account: React.FC<AccountProps> = ({ userEmail, userId, onClose }) 
         }
         setIsLoading(false);
     };
+
 
     return (
         <div className="user-account-container">

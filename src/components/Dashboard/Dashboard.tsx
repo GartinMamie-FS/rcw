@@ -303,7 +303,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userEmail, userRole, onLog
                             setShowIntakeSession(false);
                         }}
                     >
-                        Create Public Awareness/Impact Report
+                        Create Public Awareness/Impact Event
                     </button>
                     <button
                         className="dashboard-nav-link"

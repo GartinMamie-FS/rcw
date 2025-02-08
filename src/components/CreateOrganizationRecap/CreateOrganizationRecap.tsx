@@ -69,27 +69,51 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
                 id: doc.id,
                 recap: doc.data() as Recap,
                 date: doc.data().date || ''
-            }));
+            }))
+                .sort((a, b) => {
+                    // Sort by the actual event date
+                    const dateA = new Date(a.date).getTime();
+                    const dateB = new Date(b.date).getTime();
+                    return dateB - dateA;
+                });
+
             setRecaps(recapsList);
         };
 
         loadRecaps();
     }, [organizationId]);
 
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!organizationId || !selectedRecapType) return;
 
         const db = getFirestore();
-        const currentDate = new Date().toLocaleDateString();
+
+        // Format the date from the form data
+        const formattedData = { ...formData };
+        selectedRecapType.fields.forEach(field => {
+            if (field.type === 'date' && formData[field.id]) {
+                // Convert YYYY-MM-DD to MM/DD/YYYY
+                const [year, month, day] = formData[field.id].split('-');
+                formattedData[field.id] = `${month}/${day}/${year}`;
+            }
+        });
+
+        // Use the first date field as the recap date, or current date if none exists
+        let recapDate = new Date().toLocaleDateString();
+        const dateField = selectedRecapType.fields.find(field => field.type === 'date');
+        if (dateField && formData[dateField.id]) {
+            recapDate = formattedData[dateField.id];
+        }
 
         await addDoc(collection(db, 'organizations', organizationId, 'recaps'), {
             name: recapName,
-            date: currentDate,
+            date: recapDate,
             createdAt: new Date(),
             recapTypeId: selectedRecapType.id,
             recapTypeName: selectedRecapType.name,
-            fields: formData
+            fields: formattedData
         });
 
         // Refresh the recaps list
