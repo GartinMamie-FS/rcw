@@ -87,6 +87,26 @@ const RecapTypeForm: React.FC<{
 
     return (
         <div className="recap-type-form">
+            <h4 className="examples-header">Examples</h4>
+            <div className="field-examples-container">
+                <div className="field-example-column">
+                    <p className="example-title">Community Collaboration:</p>
+                    <ul>
+                        <li>Field 1: Date</li>
+                        <li>Field 2: Details</li>
+                        <li>Field 3: Number of Participants</li>
+                    </ul>
+                </div>
+                <div className="field-example-column">
+                    <p className="example-title">Narcan Distribution:</p>
+                    <ul>
+                        <li>Field 1: Date</li>
+                        <li>Field 2: Location</li>
+                        <li>Field 3: Number of Distributed</li>
+                    </ul>
+                </div>
+            </div>
+
             <div className="form-group">
                 <label>Public Awareness/Impact Name</label>
                 <input
@@ -98,25 +118,6 @@ const RecapTypeForm: React.FC<{
 
             <div className="fields-section">
                 <h3>Report Fields</h3>
-                <h4 className="examples-header">Examples</h4>
-                <div className="field-examples-container">
-                    <div className="field-example-column">
-                        <p className="example-title">Community Collaboration:</p>
-                        <ul>
-                            <li>Field 1: Date</li>
-                            <li>Field 2: Details</li>
-                            <li>Field 3: Number of Participants</li>
-                        </ul>
-                    </div>
-                    <div className="field-example-column">
-                        <p className="example-title">Narcan Distribution:</p>
-                        <ul>
-                            <li>Field 1: Date</li>
-                            <li>Field 2: Location</li>
-                            <li>Field 3: Number of Distributed</li>
-                        </ul>
-                    </div>
-                </div>
                 {fields.map((field, index) => (
                     <div key={field.id} className="field-item">
                         <input

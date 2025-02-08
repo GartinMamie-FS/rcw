@@ -231,14 +231,14 @@ export const CreateOrganizationRecapScreen: React.FC<CreateOrganizationRecapScre
                             className="org-recap-submit-button"
                             disabled={!recapName.trim() || !organizationId || !selectedRecapType}
                         >
-                            Create Recap
+                            Create Activity
                         </button>
                     </div>
                 </form>
             </div>
 
             <div className="org-recap-list">
-                <h3>Recent Organization Recaps</h3>
+                <h3>Recent Public Awareness/Impact Activities</h3>
                 <table className="org-recap-table">
                     <thead>
                     <tr>
