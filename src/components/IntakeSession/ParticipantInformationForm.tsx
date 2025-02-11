@@ -4,7 +4,7 @@ import { useOrganization } from '../../context/OrganizationContext';
 import { format } from 'date-fns';
 
 interface ParticipantInformationFormProps {
-    onComplete: (id: string) => void;
+    onComplete: (id: string, dateOfBirth: string) => void;
     organizationId: string;
 }
 
@@ -94,7 +94,7 @@ export const ParticipantInformationForm: React.FC<ParticipantInformationFormProp
                 disabled={!firstName || !lastName || !organizationId}
                 onClick={async () => {
                     const id = await saveParticipantInfo();
-                    onComplete(id);
+                    onComplete(id, dateOfBirth);
                 }}
             >
                 Save

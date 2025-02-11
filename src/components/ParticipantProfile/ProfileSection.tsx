@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useOrganization } from '../../context/OrganizationContext';
-import { getFirestore, collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { getFirestore, getDoc, doc } from 'firebase/firestore';
 import './ProfileSection.css'
+import { format } from 'date-fns';
 
 interface ParticipantDetails {
     name: string;
@@ -16,6 +17,21 @@ interface ProfileSectionProps {
     onEditClick: () => void;
 }
 
+interface TabProps {
+    label: string;
+    isActive: boolean;
+    onClick: () => void;
+}
+
+const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => (
+    <button
+        className={`tab-button ${isActive ? 'active' : ''}`}
+        onClick={onClick}
+    >
+        {label}
+    </button>
+);
+
 const ProfileField = ({ label, value }: { label: string; value: string }) => (
     <div className="profile-field">
         <div className="label-container">
@@ -29,6 +45,7 @@ const ProfileField = ({ label, value }: { label: string; value: string }) => (
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({ participantId, onEditClick }) => {
     const { organizationId } = useOrganization();
+    const [activeTab, setActiveTab] = useState('profile');
     const [participantDetails, setParticipantDetails] = useState<ParticipantDetails>({
         name: '',
         dob: '',
@@ -36,38 +53,69 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ participantId, o
         email: '',
         address: ''
     });
+    const [demographics, setDemographics] = useState({
+        age: '',
+        gender: '',
+        race: '',
+        sexualOrientation: ''
+    });
 
     useEffect(() => {
-        const fetchProfile = async () => {
+        // Update the profile data fetch section in the useEffect
+        const fetchData = async () => {
             if (!organizationId || !participantId) return;
 
             const db = getFirestore();
-            const profileQuery = query(
-                collection(db, 'organizations', organizationId, 'participants', participantId, 'participantInformation'),
-                orderBy('createdAt', 'desc'),
-                limit(1)
-            );
-            const snapshot = await getDocs(profileQuery);
 
-            if (!snapshot.empty) {
-                const data = snapshot.docs[0].data();
+            // Fetch profile data from the 'details' document
+            const profileRef = doc(db, 'organizations', organizationId, 'participants', participantId, 'participantInformation', 'details');
+            const profileDoc = await getDoc(profileRef);
+
+            if (profileDoc.exists()) {
+                const data = profileDoc.data();
+                const formattedDate = data.dateOfBirth ? format(new Date(data.dateOfBirth), 'MM/dd/yyyy') : '';
                 setParticipantDetails({
                     name: `${data.firstName} ${data.lastName}`,
-                    dob: data.dateOfBirth || '',
+                    dob: formattedDate,
                     phone: data.phone || '',
                     email: data.email || '',
                     address: data.address || ''
                 });
             }
-        };
 
-        fetchProfile();
+            // Fetch demographics data
+            const demographicsRef = doc(db, 'organizations', organizationId, 'participants', participantId, 'demographics', 'current');
+            const demographicsDoc = await getDoc(demographicsRef);
+
+            if (demographicsDoc.exists()) {
+                const demoData = demographicsDoc.data();
+                setDemographics({
+                    age: demoData.age || '',
+                    gender: demoData.gender || '',
+                    race: demoData.race || '',
+                    sexualOrientation: demoData.sexualOrientation || ''
+                });
+            }
+        };
+        fetchData();
     }, [participantId, organizationId]);
+
 
     return (
         <div className="profile-section">
             <div className="header-row">
-                <h2>Peer Profile</h2>
+                <div className="tabs">
+                    <Tab
+                        label="Peer Profile"
+                        isActive={activeTab === 'profile'}
+                        onClick={() => setActiveTab('profile')}
+                    />
+                    <Tab
+                        label="Demographics"
+                        isActive={activeTab === 'demographics'}
+                        onClick={() => setActiveTab('demographics')}
+                    />
+                </div>
                 <button
                     onClick={onEditClick}
                     className="edit-button"
@@ -80,13 +128,22 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ participantId, o
 
             <hr className="divider" />
 
-            <div className="profile-fields">
-                <ProfileField label="Name" value={participantDetails.name} />
-                <ProfileField label="DOB" value={participantDetails.dob} />
-                <ProfileField label="Phone Number" value={participantDetails.phone} />
-                <ProfileField label="Email Address" value={participantDetails.email} />
-                <ProfileField label="Address" value={participantDetails.address} />
-            </div>
+            {activeTab === 'profile' ? (
+                <div className="profile-fields">
+                    <ProfileField label="Name" value={participantDetails.name} />
+                    <ProfileField label="DOB" value={participantDetails.dob} />
+                    <ProfileField label="Phone Number" value={participantDetails.phone} />
+                    <ProfileField label="Email Address" value={participantDetails.email} />
+                    <ProfileField label="Address" value={participantDetails.address} />
+                </div>
+            ) : (
+                <div className="demographics-fields">
+                    <ProfileField label="Age" value={demographics.age.toString()} />
+                    <ProfileField label="Gender" value={demographics.gender} />
+                    <ProfileField label="Race/Ethnicity" value={demographics.race} />
+                    <ProfileField label="Sexual Orientation" value={demographics.sexualOrientation} />
+                </div>
+            )}
         </div>
     );
 };

@@ -4,6 +4,7 @@ import { useOrganization } from '../../context/OrganizationContext';
 import { ParticipantInformationForm } from './ParticipantInformationForm.tsx';
 import { SessionInformationForm } from './SessionInformationForm';
 import { ParticipantAssignmentsForm } from './ParticipantAssignmentsForm';
+import { DemographicsForm } from './DemographicsForm';
 import './IntakeSession.css';
 
 interface IntakeSessionProps {
@@ -18,9 +19,11 @@ export const IntakeSession: React.FC<IntakeSessionProps> = ({ onClose, onComplet
     const [currentPage, setCurrentPage] = useState('Participant Information');
     const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
     const [participantId, setParticipantId] = useState('');
+    const [participantDateOfBirth, setParticipantDateOfBirth] = useState('');
 
     const navigationItems = [
         'Participant Information',
+        'Demographics',
         'Session Information',
         'Participant Assignments'
     ];
@@ -81,9 +84,21 @@ export const IntakeSession: React.FC<IntakeSessionProps> = ({ onClose, onComplet
                     {currentPage === 'Participant Information' && (
                         <ParticipantInformationForm
                             organizationId={organizationId}
-                            onComplete={(id) => {
+                            onComplete={(id, dob) => {
                                 setParticipantId(id);
+                                setParticipantDateOfBirth(dob);
                                 setCompletedSections(prev => new Set([...prev, 'Participant Information']));
+                                setCurrentPage('Demographics');
+                            }}
+                        />
+                    )}
+                    {currentPage === 'Demographics' && (
+                        <DemographicsForm
+                            participantId={participantId}
+                            dateOfBirth={participantDateOfBirth}
+                            organizationId={organizationId}
+                            onComplete={() => {
+                                setCompletedSections(prev => new Set([...prev, 'Demographics']));
                                 setCurrentPage('Session Information');
                             }}
                         />

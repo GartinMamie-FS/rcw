@@ -16,5 +16,7 @@ export interface LocationWithParticipantCount {
 export enum ReportType {
     ORGANIZATION = 'ORGANIZATION',
     PROGRAM = 'PROGRAM',
-    RECAPS = 'recaps'
+    RECAPS = 'recaps',
+    DEMOGRAPHICS = 'demographics'
 }
+

@@ -6,6 +6,8 @@ import './ReportsScreen.css';
 import { OrganizationWideReport } from './OrganizationWideReport';
 import { ProgramSpecificReport } from './ProgramSpecificReport';
 import { OrganizationRecapsReport } from './OrganizationRecapsReport';
+import { DemographicsReport } from './DemographicsReport';
+
 
 interface StorageReport {
     name: string;
@@ -42,6 +44,8 @@ function renderReportContent(
             return selectedProgram ? (
                 <ProgramSpecificReport programName={selectedProgram} />
             ) : null;
+        case ReportType.DEMOGRAPHICS:
+            return <DemographicsReport />;
         default:
             return (
                 <p className="select-prompt">
@@ -158,6 +162,11 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({ organizationId }) 
                             selected={selectedReportType === ReportType.PROGRAM}
                             onClick={() => setSelectedReportType(ReportType.PROGRAM)}
                         />
+                        <ReportTypeButton
+                            text="Demographics Report"
+                            selected={selectedReportType === ReportType.DEMOGRAPHICS}
+                            onClick={() => setSelectedReportType(ReportType.DEMOGRAPHICS)}
+                        />
                     </div>
 
                     <hr />
@@ -213,6 +222,11 @@ export const ReportsScreen: React.FC<ReportsScreenProps> = ({ organizationId }) 
                     text="Program Specific Report"
                     selected={selectedReportType === ReportType.PROGRAM}
                     onClick={() => setSelectedReportType(ReportType.PROGRAM)}
+                />
+                <ReportTypeButton
+                    text="Demographics Report"
+                    selected={selectedReportType === ReportType.DEMOGRAPHICS}
+                    onClick={() => setSelectedReportType(ReportType.DEMOGRAPHICS)}
                 />
             </div>
 
