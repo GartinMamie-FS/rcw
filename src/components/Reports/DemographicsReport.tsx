@@ -13,6 +13,7 @@ import {
 import { getStorage, ref, uploadBytes } from 'firebase/storage';
 import { jsPDF } from 'jspdf';
 import './DemographicsReport.css';
+import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
 
 interface DemographicCounts {
     [key: string]: number;
@@ -306,6 +307,77 @@ export const DemographicsReport: React.FC = () => {
             <div className="total-card">
                 <h3>Total Participants</h3>
                 <span>{totalParticipants}</span>
+            </div>
+
+            <div className="charts-container">
+                <div className="chart-card">
+                    <h3>Race/Ethnicity Distribution</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                            <Pie
+                                data={Object.entries(raceCounts).map(([name, value]) => ({ name, value }))}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={80}
+                                fill="#8884d8"
+                                label
+                            >
+                                {Object.keys(raceCounts).map((_, index) => (
+                                    <Cell key={`cell-${index}`} fill={`hsl(${index * 45}, 70%, 50%)`} />
+                                ))}
+                            </Pie>
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                <div className="chart-card">
+                    <h3>Gender Distribution</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                            <Pie
+                                data={Object.entries(genderCounts).map(([name, value]) => ({ name, value }))}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={80}
+                                fill="#82ca9d"
+                                label
+                            >
+                                {Object.keys(genderCounts).map((_, index) => (
+                                    <Cell key={`cell-${index}`} fill={`hsl(${index * 45 + 120}, 70%, 50%)`} />
+                                ))}
+                            </Pie>
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                <div className="chart-card">
+                    <h3>Sexual Orientation Distribution</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                            <Pie
+                                data={Object.entries(orientationCounts).map(([name, value]) => ({ name, value }))}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={80}
+                                fill="#ffc658"
+                                label
+                            >
+                                {Object.keys(orientationCounts).map((_, index) => (
+                                    <Cell key={`cell-${index}`} fill={`hsl(${index * 45 + 240}, 70%, 50%)`} />
+                                ))}
+                            </Pie>
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
             </div>
         </div>
     );
